@@ -25,7 +25,10 @@
 
 #define LOGFILE "/var/log/uxlaunch.log"
 
+extern char **environ;
+
 static int first_time = 1;
+static int logfile_enabled = 1;
 
 struct timeval start;
 
@@ -56,12 +59,32 @@ void log_string(char *string)
 		strcat(msg, "\n");
 	fprintf(stderr, msg);
 
+	if (!logfile_enabled)
+		return;
+
 	log = fopen(LOGFILE, "w");
 	if (log) {
 		fputs(msg, log);
 		fclose(log);
 	} else {
+		logfile_enabled = 0;
 		log_string("Unable to write logfile");
 	}
+}
+
+
+void log_environment(void)
+{
+	char **env;
+
+	env = environ;
+	
+	log_string("Dumping environment");
+	log_string("----------------------------------");
+	while (env) {
+		log_string(*env);
+		env++;
+	}
+	log_string("----------------------------------");
 }
 

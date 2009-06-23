@@ -20,4 +20,6 @@
 
 void setup_consolekit_session(void)
 {
+	log_string("Entering setup_consolekit_session");
+	log_string("Leaving setup_consolekit_session");
 }

@@ -18,6 +18,8 @@ extern void autostart_desktop_files(void);
 
 
 extern void log_string(char *string);
+extern void log_environment(void);
+
 extern void close_log(void);
 
 #endif
