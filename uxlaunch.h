@@ -8,6 +8,9 @@
 extern char *user;
 extern int   uid;
 
+extern char *displaydev[];
+extern char *displayname[];
+
 
 extern void find_user(int argc, char **argv);
 extern void setup_pam_session(void);
@@ -29,12 +32,6 @@ extern void log_string(char *string);
 extern void log_environment(void);
 
 extern void close_log(void);
-
-/*
- * global variables
- */
-extern char displaydev[256];		/* "/dev/tty1" */
-extern char displayname[256];		/* ":0" */
 
 
 #endif
