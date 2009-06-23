@@ -18,11 +18,13 @@
 #include <string.h>
 #include <sys/types.h>
 #include <dirent.h>
+#include <sys/types.h>
+#include <pwd.h>
 
 #include "uxlaunch.h"
 
 char *user;
-int   uid;
+int uid;
 
 /*
  * This function needs to find the user name and UID/GID of the user
@@ -39,6 +41,7 @@ void find_user(int argc, char **argv)
 {
 	DIR *dir;
 	struct dirent *entry;
+	struct passwd *pass;
 	int i;
 	log_string("Entering find_user");
 
@@ -93,6 +96,12 @@ void find_user(int argc, char **argv)
 
 	log_string("user found is:");
 	log_string(user);	
+
+	/* translate user name to uid */
+	pass = getpwnam(user);
+	if (pass)
+		uid = pass->pw_uid;
+
 	log_string("Leaving find_user");
 }
 
