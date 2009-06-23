@@ -35,6 +35,13 @@ void find_user(int argc, char **argv)
 	log_string("Leaving find_user");
 }
 
+/*
+ * Change from root (as we started) to the target user.
+ * Steps
+ * 1) setuid/getgid
+ * 2) env variables: HOME, MAIL, LOGNAME
+ * 3) chdir(/home/foo);
+ */
 void switch_to_user(void)
 {
 	log_string("Entering switch_to_user");
