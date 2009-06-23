@@ -24,6 +24,20 @@ void start_ssh_agent(void)
 	log_string("Leaving start_ssh_agent");
 }
 
+void start_bash(void)
+{
+	int ret;
+
+	log_string("Entering start_bash");
+
+	fprintf(stderr, "Starting bash shell -- type exit to continue\n");
+	ret = system("/bin/bash");
+	if (ret != EXIT_SUCCESS)
+		log_string("bash returned an error");
+
+	log_string("Leaving start_bash");
+}
+
 void start_gconf(void)
 {
 	log_string("Entering start_gconf");
