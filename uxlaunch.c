@@ -23,11 +23,10 @@ int main(int argc, char **argv)
 {
 
 	find_user();
+	find_display_and_tty();
 
 	setup_pam_session();
 	switch_to_user();
-
-	find_display_and_tty();
 
 	start_X_server();
 	wait_for_X_signal();
