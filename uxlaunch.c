@@ -43,5 +43,7 @@ int main(int argc, char **argv)
 
 	autostart_desktop_files();
 
+	close_log();
+
 	return EXIT_SUCCESS; 
 }
