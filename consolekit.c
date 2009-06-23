@@ -35,6 +35,7 @@ void setup_consolekit_session(void)
 		exit(1);
 
 	dbus_error_init(&error);
+	// FIXME - open session with parameters instead
 	if (!ck_connector_open_session(connector, &error)) {
 		printf("Error: Unable to open session with ConsoleKit: %s: %s\n",
 			error.name, error.message);
