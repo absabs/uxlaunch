@@ -18,10 +18,6 @@
 
 #include "uxlaunch.h"
 
-#include <dbus/dbus.h>
-#include <ck-connector.h>
-
-CkConnector *connector = NULL;
 
 void find_display_and_tty(void)
 {
