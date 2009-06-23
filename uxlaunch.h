@@ -2,6 +2,13 @@
 #define __INCLUDE_GUARD_UXLAUNCH_
 
 
+/*
+ * Target user information
+ */
+char *user;
+int   uid;
+
+
 extern void find_user(int argc, char **argv);
 extern void setup_pam_session(void);
 extern void switch_to_user(void);
