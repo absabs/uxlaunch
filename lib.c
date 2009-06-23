@@ -23,6 +23,7 @@
 #include "uxlaunch.h"
 
 
+extern char **environ;
 
 static int first_time = 1;
 
