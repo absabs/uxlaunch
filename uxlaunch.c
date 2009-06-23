@@ -45,5 +45,13 @@ int main(int argc, char **argv)
 
 	autostart_desktop_files();
 
+	// FIXME - start wm in foreground, wait for it to die
+	// fork .desktop file startup in background thread
+	// then when wm dies, close session stuff properly:
+
+	// close_consolekit_session();
+	// stop_dbus_session_bus();
+	// close_pam_session();
+
 	return EXIT_SUCCESS; 
 }
