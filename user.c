@@ -15,8 +15,14 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <dirent.h>
 
 #include "uxlaunch.h"
+
+char *user;
+int   uid;
 
 /*
  * This function needs to find the user name and UID/GID of the user
@@ -31,7 +37,62 @@
 
 void find_user(int argc, char **argv)
 {
+	DIR *dir;
+	struct dirent *entry;
+	int i;
 	log_string("Entering find_user");
+
+	/* pass 1: find --user on the command line */
+	for (i = 0; i < argc -1 ; i++) {
+		if (strcmp(argv[i], "--user") == 0) {
+			user = strdup(argv[i+1]);
+		}
+	}
+
+	/* pass 2: look in the /etc/sysconfig/uxlaunch file */
+	if (!user) {
+		FILE *file;
+		char line[1024];
+		file = fopen("/etc/sysconfig/uxlaunch", "r");
+		if (file) {
+			char *c;
+			memset(line, 0, 1024);
+			if (fgets(line, 1023, file) == NULL) 
+				memset(line, 0, 1024);
+			fclose(file);
+			c = strchr(line, '=');
+			if (c) c++;
+			if (c && *c && strstr(line, "user ="))
+				user = strdup(c);
+		}
+	}
+	/* pass 3: first user in /home */
+
+	if (!user) {
+		dir = opendir("/home");
+		while (dir) {
+			entry = readdir(dir);
+			if (!entry)
+				break;
+			if (entry->d_name[0] == '.')
+				continue;
+			if (strcmp(entry->d_name, "lost+found")==0)
+				continue;
+			if (entry->d_type != DT_DIR)
+				continue;
+			user = strdup(entry->d_name);
+			break;	
+		}
+		if (dir)
+			closedir(dir);
+	}
+
+	/* pass 4: "moblin" */
+	if (!user)
+		user = strdup("moblin");
+
+	log_string("user found is:");
+	log_string(user);	
 	log_string("Leaving find_user");
 }
 
