@@ -15,11 +15,67 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <signal.h>
+
+#include <dbus/dbus.h>
 
 #include "uxlaunch.h"
 
+static char dbus_pid[255];
+static char dbus_address[255];
+
+
 void start_dbus_session_bus(void)
 {
+	int p_fd[2];
+	int a_fd[2];
+	char cmd[255];
+	int result;
+
 	log_string("Entering start_dbus_session_bus");
+
+	if (pipe(p_fd) < 0)
+		exit(1);
+	if (pipe(a_fd) < 0) {
+		close(p_fd[0]);
+		close(p_fd[1]);
+		exit(1);
+	}
+
+	sprintf(cmd, "dbus-daemon --fork --session --print-pid %d --print-address %d",
+		p_fd[1], a_fd[1]);
+
+	result = system(cmd);
+
+	close(p_fd[1]);
+	close(a_fd[1]);
+
+	result = read(p_fd[0], dbus_pid, sizeof(dbus_pid));
+	result = read(a_fd[0], dbus_address, sizeof(dbus_address));
+
+	/* chomp() */
+	dbus_pid[strlen(dbus_pid) - 1] = '\0';
+	dbus_address[strlen(dbus_address) - 1] = '\0';
+
+	close(p_fd[0]);
+	close(a_fd[0]);
+
+	setenv("DBUS_SESSION_BUS_PID", dbus_pid, 1);
+	setenv("DBUS_SESSION_BUS_ADDRESS", dbus_address, 1);
+
+	log_environment();
+
 	log_string("Leaving start_dbus_session_bus");
+}
+
+void stop_dbus_session_bus(void)
+{
+	log_string("Entering stop_dbus_session_bus");
+
+	kill(atoi(dbus_pid), SIGTERM);
+	unsetenv("DBUS_SESSION_BUS_PID");
+	unsetenv("DBUS_SESSION_BUS_ADDRESS");
+
+	log_string("Leaving stop_dbus_session_bus");
 }
