@@ -18,6 +18,9 @@
 
 #include "uxlaunch.h"
 
+char displaydev[256];		/* "/dev/tty1" */
+char displayname[256];		/* ":0" */
+
 
 void find_display_and_tty(void)
 {
@@ -26,11 +29,11 @@ void find_display_and_tty(void)
 
 	log_string("Entering find_display_and_tty");
 
-	len = readlink("/proc/self/fd/0", *displaydev, sizeof(displaydev) - 1);
+	len = readlink("/proc/self/fd/0", displaydev, sizeof(displaydev) - 1);
 	if (len != -1)
 		displaydev[len] = '\0';
 
-	sprintf(msg, "tty = %s", *displaydev);
+	sprintf(msg, "tty = %s", displaydev);
 	log_string(msg);
 
 	log_string("Leaving find_display_and_tty");

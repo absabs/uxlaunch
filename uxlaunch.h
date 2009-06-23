@@ -33,8 +33,8 @@ extern void close_log(void);
 /*
  * global variables
  */
-extern char *displaydev[256];		/* "/dev/tty1" */
-extern char *displayname[256];		/* ":0" */
+extern char displaydev[256];		/* "/dev/tty1" */
+extern char displayname[256];		/* ":0" */
 
 
 #endif
