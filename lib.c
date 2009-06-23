@@ -23,21 +23,22 @@
 #include "uxlaunch.h"
 
 
+#define LOGFILE "/var/log/uxlaunch.log"
+
 extern char **environ;
 
 static int first_time = 1;
+static int logfile_enabled = 1;
 
 struct timeval start;
-
-#define LOG_MAX 65536
-char msglog[LOG_MAX] = "";
 
 void log_string(char *string)
 {
 	struct timeval current;
 	uint64_t secs, usecs;
-	char msg[81920];
-
+	char msg[8192];
+	char msg[1024];
+	FILE *log;
 
 	if (first_time) {
 		first_time = 0;
@@ -59,23 +60,18 @@ void log_string(char *string)
 		strcat(msg, "\n");
 	fprintf(stderr, "%s", msg);
 
-	if ((strlen(msglog) + strlen(msg)) < LOG_MAX)
-		strcat(msglog, msg);
-}
+	if (!logfile_enabled)
+		return;
 
-void close_log(void)
-{
-	FILE *log;
-
-	log = fopen("/var/log/uxlaunch.log", "w");
+	log = fopen(LOGFILE, "w");
 	if (log) {
-		fputs(msglog, log);
+		fputs(msg, log);
 		fclose(log);
 	} else {
-		log_string("Unable to write log on exit");
+		logfile_enabled = 0;
+		log_string("Unable to write logfile");
 	}
 }
-
 
 
 void log_environment(void)
@@ -92,3 +88,4 @@ void log_environment(void)
 	}
 	log_string("----------------------------------");
 }
+
