@@ -82,9 +82,12 @@ void log_environment(void)
 	char **env;
 
 	env = environ;
-
+	
+	log_string("Dumping environment");
+	log_string("----------------------------------");
 	while (env) {
 		log_string(*env);
 		env++;
 	}
+	log_string("----------------------------------");
 }
