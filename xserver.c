@@ -18,9 +18,25 @@
 
 #include "uxlaunch.h"
 
+#include <dbus/dbus.h>
+#include <ck-connector.h>
+
+CkConnector *connector = NULL;
+
 void find_display_and_tty(void)
 {
+	int len;
+	char msg[256];
+
 	log_string("Entering find_display_and_tty");
+
+	len = readlink("/proc/self/fd/0", *displaydev, sizeof(displaydev) - 1);
+	if (len != -1)
+		displaydev[len] = '\0';
+
+	sprintf(msg, "tty = %s", *displaydev);
+	log_string(msg);
+
 	log_string("Leaving find_display_and_tty");
 }
 

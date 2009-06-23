@@ -23,4 +23,11 @@ extern void log_environment(void);
 
 extern void close_log(void);
 
+/*
+ * global variables
+ */
+char *displaydev[256];		/* "/dev/tty1" */
+char *displayname[256];		/* ":0" */
+
+
 #endif
