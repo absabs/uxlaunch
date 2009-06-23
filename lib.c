@@ -66,7 +66,7 @@ void close_log(void)
 {
 	FILE *log;
 
-	log = fopen("/var/log/smartinit.log", "w");
+	log = fopen("/var/log/uxlaunch.log", "w");
 	if (log) {
 		fputs(msglog, log);
 		fclose(log);
