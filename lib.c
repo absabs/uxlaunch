@@ -37,7 +37,6 @@ void log_string(char *string)
 	struct timeval current;
 	uint64_t secs, usecs;
 	char msg[8192];
-	char msg[1024];
 	FILE *log;
 
 	if (first_time) {
