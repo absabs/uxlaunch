@@ -8,8 +8,8 @@
 extern char *user;
 extern int   uid;
 
-extern char *displaydev[];
-extern char *displayname[];
+extern char displaydev[];
+extern char displayname[];
 
 
 extern void find_user(int argc, char **argv);
