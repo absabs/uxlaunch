@@ -18,11 +18,48 @@
 
 #include "uxlaunch.h"
 
+#include <dbus/dbus.h>
+#include <ck-connector.h>
+
+static CkConnector *connector = NULL;
+
+
 void setup_consolekit_session(void)
 {
+	DBusError error;
+
 	log_string("Entering setup_consolekit_session");
+
+	connector = ck_connector_new();
+	if (!connector)
+		exit(1);
+
+	dbus_error_init(&error);
+	if (!ck_connector_open_session(connector, &error)) {
+		printf("Error: Unable to open session with ConsoleKit: %s: %s\n",
+			error.name, error.message);
+		exit(1);
+	}
+
+	setenv("XDG_SESSION_COOKIE", ck_connector_get_cookie(connector), 1);
 
 	log_environment();
 
 	log_string("Leaving setup_consolekit_session");
+}
+
+
+void close_consolekit_session(void)
+{
+	log_string("Entering close_consolekit_session");
+
+	DBusError error;
+
+	dbus_error_init(&error);
+	if (connector)
+		ck_connector_close_session(connector, &error);
+
+	unsetenv("XDG_SESSION_COOKIE");
+
+	log_string("Leaving close_consolekit_session");
 }
