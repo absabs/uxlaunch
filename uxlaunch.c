@@ -28,6 +28,8 @@ int main(int argc, char **argv)
 	setup_pam_session();
 	switch_to_user();
 
+//	start_bash();
+
 	start_X_server();
 	wait_for_X_signal();
 

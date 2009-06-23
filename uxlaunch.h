@@ -15,6 +15,7 @@ extern void start_gconf(void);
 extern void maybe_start_screensaver(void);
 extern void start_metacity(void);
 extern void autostart_desktop_files(void);
+extern void start_bash(void);
 
 
 extern void log_string(char *string);
