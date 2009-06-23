@@ -74,3 +74,17 @@ void close_log(void)
 		log_string("Unable to write log on exit");
 	}
 }
+
+
+
+void log_environment(void)
+{
+	char **env;
+
+	env = environ;
+
+	while (env) {
+		log_string(*env);
+		env++;
+	}
+}
