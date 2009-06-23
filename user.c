@@ -20,9 +20,13 @@
 
 void find_user(void)
 {
+	log_string("Entering find_user\n");
+	log_string("Leaving find_user\n");
 }
 
 void switch_to_user(void)
 {
+	log_string("Entering switch_to_user\n");
+	log_string("Leaving switch_to_user\n");
 }
 

@@ -20,4 +20,6 @@
 
 void start_dbus_session_bus(void)
 {
+	log_string("Entering start_dbus_session_bus\n");
+	log_string("Leaving start_dbus_session_bus\n");
 }
