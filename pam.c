@@ -20,5 +20,5 @@
 
 void setup_pam_session(void)
 {
-	log_string("Entering setup_pam_session");
+	log_string("** Entering setup_pam_session");
 }

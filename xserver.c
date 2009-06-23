@@ -39,11 +39,11 @@ void find_display_and_tty(void)
 
 void start_X_server(void)
 {
-	log_string("Entering start_X_server");
+	log_string("** Entering start_X_server");
 }
 
 void wait_for_X_signal(void)
 {
-	log_string("Entering wait_for_X_signal");
+	log_string("** Entering wait_for_X_signal");
 }
  

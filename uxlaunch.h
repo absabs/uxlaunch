@@ -2,12 +2,6 @@
 #define __INCLUDE_GUARD_UXLAUNCH_
 
 
-/*
- * Target user information
- */
-extern char *user;
-extern int   uid;
-
 
 extern void find_user(int argc, char **argv);
 extern void setup_pam_session(void);
@@ -35,6 +29,9 @@ extern void close_log(void);
  */
 extern char displaydev[256];		/* "/dev/tty1" */
 extern char displayname[256];		/* ":0" */
+extern char *user;			/* target user */
+extern int   uid;			/* target uid */
+
 
 
 #endif

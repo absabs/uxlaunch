@@ -112,6 +112,6 @@ void find_user(int argc, char **argv)
  */
 void switch_to_user(void)
 {
-	log_string("Entering switch_to_user");
+	log_string("** Entering switch_to_user");
 }
 
