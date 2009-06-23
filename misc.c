@@ -20,20 +20,20 @@
 
 void start_ssh_agent(void)
 {
-	log_string("Entering start_ssh_agent\n");
-	log_string("Leaving start_ssh_agent\n");
+	log_string("Entering start_ssh_agent");
+	log_string("Leaving start_ssh_agent");
 }
 
 void start_gconf(void)
 {
-	log_string("Entering start_gconf\n");
-	log_string("Leaving start_gconf\n");
+	log_string("Entering start_gconf");
+	log_string("Leaving start_gconf");
 }
 
 
 void maybe_start_screensaver(void)
 {
-	log_string("Entering maybe_start_screensaver\n");
-	log_string("Leaving maybe_start_screensaver\n");
+	log_string("Entering maybe_start_screensaver");
+	log_string("Leaving maybe_start_screensaver");
 }
 

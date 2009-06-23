@@ -20,6 +20,6 @@
 
 void setup_pam_session(void)
 {
-	log_string("Entering setup_pam_session\n");
-	log_string("Leaving setup_pam_session\n");
+	log_string("Entering setup_pam_session");
+	log_string("Leaving setup_pam_session");
 }
