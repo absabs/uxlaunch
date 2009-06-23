@@ -35,19 +35,15 @@ void find_display_and_tty(void)
 
 	sprintf(msg, "tty = %s", displaydev);
 	log_string(msg);
-
-	log_string("Leaving find_display_and_tty");
 }
 
 void start_X_server(void)
 {
 	log_string("Entering start_X_server");
-	log_string("Leaving start_X_server");
 }
 
 void wait_for_X_signal(void)
 {
 	log_string("Entering wait_for_X_signal");
-	log_string("Leaving wait_for_X_signal");
 }
  

@@ -101,8 +101,6 @@ void find_user(int argc, char **argv)
 	pass = getpwnam(user);
 	if (pass)
 		uid = pass->pw_uid;
-
-	log_string("Leaving find_user");
 }
 
 /*
@@ -115,6 +113,5 @@ void find_user(int argc, char **argv)
 void switch_to_user(void)
 {
 	log_string("Entering switch_to_user");
-	log_string("Leaving switch_to_user");
 }
 

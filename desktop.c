@@ -21,11 +21,9 @@
 void autostart_desktop_files(void)
 {
 	log_string("Entering autostart_desktop_files");
-	log_string("Leaving autostart_desktop_files");
 }
 
 void start_metacity(void)
 {
 	log_string("Entering start_metacity");
-	log_string("Leaving start_metacity");
 }

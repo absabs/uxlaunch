@@ -45,8 +45,6 @@ void setup_consolekit_session(void)
 	setenv("XDG_SESSION_COOKIE", ck_connector_get_cookie(connector), 1);
 
 	log_environment();
-
-	log_string("Leaving setup_consolekit_session");
 }
 
 
@@ -61,6 +59,4 @@ void close_consolekit_session(void)
 		ck_connector_close_session(connector, &error);
 
 	unsetenv("XDG_SESSION_COOKIE");
-
-	log_string("Leaving close_consolekit_session");
 }

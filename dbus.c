@@ -65,8 +65,6 @@ void start_dbus_session_bus(void)
 	setenv("DBUS_SESSION_BUS_ADDRESS", dbus_address, 1);
 
 	log_environment();
-
-	log_string("Leaving start_dbus_session_bus");
 }
 
 void stop_dbus_session_bus(void)
@@ -76,6 +74,4 @@ void stop_dbus_session_bus(void)
 	kill(atoi(dbus_pid), SIGTERM);
 	unsetenv("DBUS_SESSION_BUS_PID");
 	unsetenv("DBUS_SESSION_BUS_ADDRESS");
-
-	log_string("Leaving stop_dbus_session_bus");
 }
