@@ -18,7 +18,18 @@
 
 #include "uxlaunch.h"
 
-void find_user(void)
+/*
+ * This function needs to find the user name and UID/GID of the user
+ * we want to be logged in as.
+ * Stragegy:
+ * Pick the first one from
+ * 1) passed as --user <name> on the command line
+ * 2) from /etc/sysconfig/uxlaunch
+ * 3) first user in /home
+ * 4) "moblin"
+ */
+
+void find_user(int argc, char **argv)
 {
 	log_string("Entering find_user");
 	log_string("Leaving find_user");

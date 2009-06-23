@@ -2,7 +2,7 @@
 #define __INCLUDE_GUARD_UXLAUNCH_
 
 
-extern void find_user(void);
+extern void find_user(int argc, char **argv);
 extern void setup_pam_session(void);
 extern void switch_to_user(void);
 extern void find_display_and_tty(void);
