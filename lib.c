@@ -62,7 +62,7 @@ void log_string(char *string)
 	if (!logfile_enabled)
 		return;
 
-	log = fopen(LOGFILE, "w");
+	log = fopen(LOGFILE, "a");
 	if (log) {
 		fputs(msg, log);
 		fclose(log);
