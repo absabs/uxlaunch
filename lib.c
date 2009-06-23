@@ -36,7 +36,7 @@ void log_string(char *string)
 {
 	struct timeval current;
 	uint64_t secs, usecs;
-	char msg[1024];
+	char msg[81920];
 
 
 	if (first_time) {
@@ -57,7 +57,7 @@ void log_string(char *string)
 	sprintf(msg, "[%02llu.%06llu] %s", secs, usecs, string);
 	if (msg[strlen(msg)] != '\n')
 		strcat(msg, "\n");
-	fprintf(stderr, msg);
+	fprintf(stderr, "%s", msg);
 
 	if ((strlen(msglog) + strlen(msg)) < LOG_MAX)
 		strcat(msglog, msg);
@@ -86,7 +86,7 @@ void log_environment(void)
 	
 	log_string("Dumping environment");
 	log_string("----------------------------------");
-	while (env) {
+	while (*env) {
 		log_string(*env);
 		env++;
 	}
