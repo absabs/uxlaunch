@@ -5,8 +5,8 @@
 /*
  * Target user information
  */
-char *user;
-int   uid;
+extern char *user;
+extern int   uid;
 
 
 extern void find_user(int argc, char **argv);
@@ -33,8 +33,8 @@ extern void close_log(void);
 /*
  * global variables
  */
-char *displaydev[256];		/* "/dev/tty1" */
-char *displayname[256];		/* ":0" */
+extern char *displaydev[256];		/* "/dev/tty1" */
+extern char *displayname[256];		/* ":0" */
 
 
 #endif
