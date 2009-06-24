@@ -63,7 +63,7 @@ static void do_desktop_file(const char *filename)
 			log_string("Failure doing autostart");
 		}
 	}
-		
+	exit(0);		
 }
 
 void autostart_desktop_files(void)
