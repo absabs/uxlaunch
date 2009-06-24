@@ -73,6 +73,8 @@ void autostart_desktop_files(void)
 	while (1) {
 		char filename[PATH_MAX];
 		entry = readdir(dir);
+		if (!entry)
+			break;
 		if (entry->d_name[0] == '.')
 			continue;
 		if (entry->d_type != DT_REG)
