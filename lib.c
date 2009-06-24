@@ -42,6 +42,10 @@ void log_string(char *string)
 	if (first_time) {
 		first_time = 0;
 		gettimeofday(&start, NULL);
+		/* truncate log */
+		log = fopen(LOGFILE, "w");
+		if (log)
+			fclose(log);
 	}
 
 	gettimeofday(&current, NULL);
