@@ -15,6 +15,8 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <signal.h>
 
 #include "uxlaunch.h"
 
@@ -37,9 +39,10 @@ void find_display_and_tty(void)
 	log_string(msg);
 }
 
-static void use1handler(int foo)
+static void usr1handler(int foo)
 {
 	/* Got the signal from the X server that it's ready */
+	if (foo++) foo--;
 }
 
 /*
@@ -52,19 +55,39 @@ static void use1handler(int foo)
 void start_X_server(void)
 {
 	struct sigaction act;
+	char *xserver = NULL;
+	int ret;
 
 	log_string("** Entering start_X_server");
+
+	/* Step 1: arm the signal */
 
 	memset(&act, 0, sizeof(struct sigaction));
 
 	act.sa_handler = usr1handler;
 	sigaction(SIGUSR1, &act, NULL);
 
+	/* Step 2: fork */
+
 	ret = fork();
 	if (!ret)
 		return; /* we're the main thread */
 
+	/* if we get here we're the child */
+
+	/* Step 3: find the X server */
+
+	if (!xserver && !access("/usr/bin/Xorg", X_OK))
+		xserver = "/usr/bin/Xorg";
+	if (!xserver && !access("/usr/bin/X", X_OK))
+		xserver = "/usr/bin/X";
+	if (!xserver) {
+		log_string("No X server found!");
+		return;
+	}
 	
+	/* Step 4: start the X server */
+	execl(xserver, xserver,  displayname, "-nr", "-verbose", /* xauth cookie, */ "-nolisten", "-tcp", "vt2"  , NULL);
 }
 
 void wait_for_X_signal(void)
