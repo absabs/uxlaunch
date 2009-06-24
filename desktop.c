@@ -28,8 +28,6 @@ void start_metacity(void)
 	int ret;
 	log_string("Entering start_metacity");
 
-	system("/usr/bin/xterm -display :0");
-
 	ret = system("/usr/bin/metacity");
 	if (ret != EXIT_SUCCESS) 
 		log_string("Failure to start metacity");
