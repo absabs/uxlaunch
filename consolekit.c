@@ -12,9 +12,11 @@
  * of the License.
  */
 
+#include <sys/types.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <pwd.h>
 
 #include "uxlaunch.h"
 
@@ -26,6 +28,7 @@ static CkConnector *connector = NULL;
 
 void setup_consolekit_session(void)
 {
+	char userid[80];
 	DBusError error;
 
 	log_string("Entering setup_consolekit_session");
@@ -34,9 +37,15 @@ void setup_consolekit_session(void)
 	if (!connector)
 		exit(1);
 
+	sprintf(userid, "%d", pass->pw_uid);
+
 	dbus_error_init(&error);
 	// FIXME - open session with parameters instead
-	if (!ck_connector_open_session(connector, &error)) {
+	if (!ck_connector_open_session_with_parameters(connector, &error,
+						       "unix-user", userid,
+						       "display-device", displaydev,
+						       "x11-display-device", displayname,
+						       NULL)) {
 		printf("Error: Unable to open session with ConsoleKit: %s: %s\n",
 			error.name, error.message);
 		exit(1);
