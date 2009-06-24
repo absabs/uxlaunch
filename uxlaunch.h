@@ -5,6 +5,7 @@
 /*
  * Target user information
  */
+extern struct passwd *pass;
 extern char *user;
 extern int   uid;
 
@@ -14,12 +15,14 @@ extern int  vtnum;
 
 extern void find_user(int argc, char **argv);
 extern void setup_pam_session(void);
+extern void close_pam_session(void);
 extern void switch_to_user(void);
 extern void find_display_and_tty(void);
 extern void setup_xauth(void);
 extern void start_X_server(void);
 extern void wait_for_X_signal(void);
 extern void start_dbus_session_bus(void);
+extern void stop_dbus_session_bus(void);
 extern void setup_consolekit_session(void);
 extern void start_ssh_agent(void);
 extern void start_gconf(void);

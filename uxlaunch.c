@@ -55,8 +55,8 @@ int main(int argc, char **argv)
 	// then when wm dies, close session stuff properly:
 
 	// close_consolekit_session();
-	// stop_dbus_session_bus();
-	// close_pam_session();
+	stop_dbus_session_bus();
+	close_pam_session();
 
 	return EXIT_SUCCESS; 
 }
