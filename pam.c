@@ -27,21 +27,32 @@ struct pam_conv pc;
 void setup_pam_session(void)
 {
 	char msg[256];
+	char x[256];
 	int err;
 
 	log_string("** Entering setup_pam_session");
 
+	sprintf(x, "tty%d", vtnum);
+
 	err = pam_start("login", pass->pw_name, &pc, &ph);
-	err = pam_open_session(ph, 0);
+
+	err = pam_set_item(ph, PAM_TTY, &x);
 	if (err != PAM_SUCCESS) {
-		sprintf(msg, "pam_open_session returned %d: %s\n", err, pam_strerror(ph, err));
+		sprintf(msg, "pam_set_item PAM_TTY returned %d: %s\n", err, pam_strerror(ph, err));
 		log_string(msg);
 		exit(1);
 	}
 
-	err = pam_set_item(ph, PAM_TTY, displaydev);
+	err = pam_set_item(ph, PAM_XDISPLAY, &displayname);
 	if (err != PAM_SUCCESS) {
-		sprintf(msg, "pam_set_item returned %d: %s\n", err, pam_strerror(ph, err));
+		sprintf(msg, "pam_set_item PAM_DISPLAY returned %d: %s\n", err, pam_strerror(ph, err));
+		log_string(msg);
+		exit(1);
+	}
+
+	err = pam_open_session(ph, 0);
+	if (err != PAM_SUCCESS) {
+		sprintf(msg, "pam_open_session returned %d: %s\n", err, pam_strerror(ph, err));
 		log_string(msg);
 		exit(1);
 	}

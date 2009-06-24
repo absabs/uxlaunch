@@ -140,6 +140,8 @@ void switch_to_user(void)
 	setenv("PATH", "/usr/bin:/bin", 0);
 	result = chdir(pass->pw_dir);
 
+	return;
+
 	/* redirect IO to .xsession-errors */
 	sprintf(fn, "%s/.xsession-errors", pass->pw_dir);
 	fp = fopen(fn, "w");

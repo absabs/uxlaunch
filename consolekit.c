@@ -28,8 +28,9 @@ static CkConnector *connector = NULL;
 
 void setup_consolekit_session(void)
 {
-	char userid[80];
 	DBusError error;
+	char *d = &displaydev[0];
+	char *n = &displayname[0];
 
 	log_string("Entering setup_consolekit_session");
 
@@ -37,14 +38,16 @@ void setup_consolekit_session(void)
 	if (!connector)
 		exit(1);
 
-	sprintf(userid, "%d", pass->pw_uid);
+fprintf(stderr, "d=%s\n", displaydev);
+fprintf(stderr, "n=%s\n", displayname);
 
 	dbus_error_init(&error);
 	// FIXME - open session with parameters instead
 	if (!ck_connector_open_session_with_parameters(connector, &error,
-						       "unix-user", userid,
-						       "display-device", displaydev,
-						       "x11-display-device", displayname,
+						       "unix-user", &uid,
+						       "display-device", &d,
+						       "x11-display-device", &d,
+						       "x11-display", &n,
 						       NULL)) {
 		printf("Error: Unable to open session with ConsoleKit: %s: %s\n",
 			error.name, error.message);
