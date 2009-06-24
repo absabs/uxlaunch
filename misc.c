@@ -15,12 +15,45 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "uxlaunch.h"
 
+/*
+ * ssh-agent prints a bunch of env variables to its stdout that we need to put in 
+ * the environment. 
+ */
 void start_ssh_agent(void)
 {
-	log_string("** Entering start_ssh_agent");
+	FILE *file;
+	char line[4096];
+	log_string("Entering start_ssh_agent");
+
+	memset(line, 0, 4096);
+
+	file = popen("/usr/bin/ssh-agent", "r");
+	if (!file) {
+		log_string("!! Failed to start ssh-agent");
+		return;
+	}
+	while (!feof(file)) {
+		char *c;
+		if (fgets(line, 4095, file)==NULL)
+			break;
+		c = strstr(line, "; export");
+		if (c) {
+			char *c2;
+			*c = 0;
+			c2 = strchr(line, '=');
+			if (c2) {
+				*c2 = 0;
+				c2++;
+				setenv(line, c2, 1);
+			}
+		}
+	}
+	pclose(file);
+	log_environment();
 }
 
 void start_bash(void)
