@@ -34,10 +34,14 @@ static void do_desktop_file(const char *filename)
 
 	memset(exec, 0, 4096);
 	while (!feof(file)) {
+		char *c;
 		if (fgets(line, 4096, file) == NULL)
 			break;
+		c = strchr(line, '\n');
+		if (c) *c = 0;	
 		if (strstr(line, "Exec="))
 			strncpy(exec, line+5, 4095);
+
 
 		if (strstr(line, "OnlyShowIn"))
 			if (strstr(line, "MOBLIN") == NULL)
@@ -53,7 +57,13 @@ static void do_desktop_file(const char *filename)
 	}
 	fclose(file);
 	if (show && strlen(exec)>0) {
-		start_daemon(BACKGROUND, exec, "");
+		char msg[4096];
+		sprintf(msg, "Starting -%s-", exec);
+		log_string(msg);
+		if (!fork()) {
+			system(exec);
+			exit(0);
+		}
 	}
 }
 
