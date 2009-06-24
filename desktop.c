@@ -26,4 +26,5 @@ void autostart_desktop_files(void)
 void start_metacity(void)
 {
 	log_string("** Entering start_metacity");
+	system("/usr/bin/xterm -display :0");
 }
