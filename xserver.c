@@ -22,7 +22,7 @@
 
 char displaydev[256];		/* "/dev/tty1" */
 char displayname[256];		/* ":0" */
-
+char xauth_cookie_file[256];    /* including an --auth prefix */
 
 void find_display_and_tty(void)
 {
@@ -63,7 +63,7 @@ void start_X_server(void)
 	char *xserver = NULL;
 	int ret;
 
-	log_string("** Entering start_X_server");
+	log_string("Entering start_X_server");
 
 	/* Step 1: arm the signal */
 
@@ -92,7 +92,7 @@ void start_X_server(void)
 	}
 	
 	/* Step 4: start the X server */
-	execl(xserver, xserver,  displayname, "-nr", "-verbose", /* xauth cookie, */ "-nolisten", "-tcp", "vt2"  , NULL);
+	execl(xserver, xserver,  displayname, "-nr", "-verbose", xauth_cookie_file, "-nolisten", "-tcp", "vt2"  , NULL);
 }
 
 void wait_for_X_signal(void)
