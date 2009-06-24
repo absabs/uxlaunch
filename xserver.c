@@ -37,9 +37,34 @@ void find_display_and_tty(void)
 	log_string(msg);
 }
 
+static void use1handler(int foo)
+{
+	/* Got the signal from the X server that it's ready */
+}
+
+/*
+ * start the X server
+ * Step 1: arm the signal
+ * Step 2: fork to get ready for the exec, continue from the main thread
+ * Step 3: find the X server
+ * Step 4: start the X server
+ */
 void start_X_server(void)
 {
+	struct sigaction act;
+
 	log_string("** Entering start_X_server");
+
+	memset(&act, 0, sizeof(struct sigaction));
+
+	act.sa_handler = usr1handler;
+	sigaction(SIGUSR1, &act, NULL);
+
+	ret = fork();
+	if (!ret)
+		return; /* we're the main thread */
+
+	
 }
 
 void wait_for_X_signal(void)
