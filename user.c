@@ -136,6 +136,7 @@ void switch_to_user(void)
 	setenv("SHELL", pass->pw_shell, 1);
 	sprintf(buf, "/var/spool/mail/%s", pass->pw_name);
 	setenv("MAIL", buf, 1);
+	setenv("DISPLAY", displayname, 1);
 	result = chdir(pass->pw_dir);
 
 	/* redirect IO to .xsession-errors */
