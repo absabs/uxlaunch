@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
+#include <pthread.h>
 
 #include "uxlaunch.h"
 
@@ -24,6 +25,12 @@ char displaydev[256];		/* "/dev/tty1" */
 char displayname[256] = ":0";	/* ":0" */
 int vtnum;	 		/* number part after /dev/tty */
 char xauth_cookie_file[256];    /* including an --auth prefix */
+
+
+
+static pthread_mutex_t notify_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t notify_condition = PTHREAD_COND_INITIALIZER;
+
 
 void find_display_and_tty(void)
 {
@@ -70,7 +77,11 @@ void setup_xauth(void)
 static void usr1handler(int foo)
 {
 	/* Got the signal from the X server that it's ready */
-	if (foo++) foo--;
+	if (foo++) foo--; /*  shut down warning */
+
+	pthread_mutex_lock(&notify_mutex);
+	pthread_cond_signal(&notify_condition);
+	pthread_mutex_unlock(&notify_mutex);
 }
 
 /*
@@ -124,6 +135,10 @@ void start_X_server(void)
 
 void wait_for_X_signal(void)
 {
-	log_string("** Entering wait_for_X_signal");
+	log_string("Entering wait_for_X_signal");
+	pthread_mutex_lock(&notify_mutex);
+	pthread_cond_wait(&notify_condition, &notify_mutex);
+	pthread_mutex_unlock(&notify_mutex);
+
 }
  
