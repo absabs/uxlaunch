@@ -27,14 +27,9 @@ static void do_desktop_file(const char *filename)
 	char line[4096];
 	char exec[4096];
 	int show = 1;
-	int ret;
 
 	file = fopen(filename, "r");
 	if (!file)
-		return;
-
-	ret = fork();
-	if (ret)
 		return;
 
 	memset(exec, 0, 4096);
@@ -58,18 +53,15 @@ static void do_desktop_file(const char *filename)
 	}
 	fclose(file);
 	if (show && strlen(exec)>0) {
-		ret = system(exec);
-		if (!ret) {
-			log_string("Failure doing autostart");
-		}
+		start_daemon(BACKGROUND, exec, "");
 	}
-	exit(0);		
 }
 
 void autostart_desktop_files(void)
 {
 	DIR *dir;
 	struct dirent *entry;
+
 	log_string("Entering autostart_desktop_files");
 
 	dir = opendir("/etc/xdg/autostart");
@@ -88,6 +80,7 @@ void autostart_desktop_files(void)
 		sprintf(filename, "/etc/xdg/autostart/%s", entry->d_name);
 		do_desktop_file(filename);
 	}
+	_exit(0);
 }
 
 void start_metacity(void)

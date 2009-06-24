@@ -37,4 +37,12 @@ extern void log_environment(void);
 
 extern void close_log(void);
 
+#define NORMAL 0
+#define NICE 1
+#define PIN 2
+#define DELAYED 4
+#define BACKGROUND 8
+
+extern void start_daemon(int flags, char *cmd, char *args);
+
 #endif
