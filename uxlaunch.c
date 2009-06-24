@@ -45,9 +45,10 @@ int main(int argc, char **argv)
 
 	maybe_start_screensaver();
 
+	autostart_desktop_files();
+
 	start_metacity();
 
-	autostart_desktop_files();
 
 	// FIXME - start wm in foreground, wait for it to die
 	// fork .desktop file startup in background thread

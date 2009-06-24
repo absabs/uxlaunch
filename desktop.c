@@ -25,5 +25,9 @@ void autostart_desktop_files(void)
 
 void start_metacity(void)
 {
-	log_string("** Entering start_metacity");
+	int ret;
+	log_string("Entering start_metacity");
+	ret = system("/usr/bin/metacity");
+	if (ret != EXIT_SUCCESS) 
+		log_string("Failure to start metacity");
 }

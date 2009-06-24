@@ -110,7 +110,7 @@ void start_X_server(void)
 	/* Step 2: fork */
 
 	ret = fork();
-	if (!ret)
+	if (ret)
 		return; /* we're the main thread */
 
 	/* if we get here we're the child */
