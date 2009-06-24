@@ -46,7 +46,25 @@ void find_display_and_tty(void)
 
 void setup_xauth(void)
 {
+	FILE *fp;
+	char cookie[16];
+	char msg[80];
+	unsigned int i;
+
 	log_string("** Entering setup_xauth");
+
+	fp = fopen("/dev/urandom", "r");
+	if (!fp)
+		return;
+	if (fgets(cookie, sizeof(cookie), fp) == NULL)
+		return;
+	sprintf(msg, "cookie = ");
+	for (i = 0; i < sizeof(cookie); i++) {
+		char c[256];
+		sprintf(c, "%02x", (unsigned char)cookie[i]);
+		strcat(msg, c);
+	}
+	log_string(msg);
 }
 
 static void usr1handler(int foo)
