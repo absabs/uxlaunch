@@ -22,6 +22,7 @@
 
 char displaydev[256];		/* "/dev/tty1" */
 char displayname[256];		/* ":0" */
+int vtnum;	 		/* number part after /dev/tty */
 char xauth_cookie_file[256];    /* including an --auth prefix */
 
 void find_display_and_tty(void)
@@ -35,7 +36,11 @@ void find_display_and_tty(void)
 	if (len != -1)
 		displaydev[len] = '\0';
 
+	vtnum = atoi(displaydev + 8);
+
 	sprintf(msg, "tty = %s", displaydev);
+	log_string(msg);
+	sprintf(msg, "vtnum = %d", vtnum);
 	log_string(msg);
 }
 
@@ -62,6 +67,7 @@ void start_X_server(void)
 	struct sigaction act;
 	char *xserver = NULL;
 	int ret;
+	char vt[80];
 
 	log_string("Entering start_X_server");
 
@@ -90,9 +96,12 @@ void start_X_server(void)
 		log_string("No X server found!");
 		return;
 	}
-	
+
+	sprintf(vt, "vt%d", vtnum);
+
 	/* Step 4: start the X server */
-	execl(xserver, xserver,  displayname, "-nr", "-verbose", xauth_cookie_file, "-nolisten", "-tcp", "vt2"  , NULL);
+	execl(xserver, xserver,  displayname, "-nr", "-verbose", xauth_cookie_file,
+	      "-nolisten", "-tcp", vt, NULL);
 }
 
 void wait_for_X_signal(void)

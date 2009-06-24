@@ -10,6 +10,7 @@ extern int   uid;
 
 extern char displaydev[];
 extern char displayname[];
+extern int  vtnum;
 
 extern void find_user(int argc, char **argv);
 extern void setup_pam_session(void);
