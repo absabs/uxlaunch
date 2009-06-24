@@ -20,11 +20,13 @@
 #include <dirent.h>
 #include <sys/types.h>
 #include <pwd.h>
+#include <grp.h>
 
 #include "uxlaunch.h"
 
 char *user;
 int uid;
+struct passwd *pass;
 
 /*
  * This function needs to find the user name and UID/GID of the user
@@ -41,7 +43,6 @@ void find_user(int argc, char **argv)
 {
 	DIR *dir;
 	struct dirent *entry;
-	struct passwd *pass;
 	int i;
 	log_string("Entering find_user");
 
@@ -60,7 +61,7 @@ void find_user(int argc, char **argv)
 		if (file) {
 			char *c;
 			memset(line, 0, 1024);
-			if (fgets(line, 1023, file) == NULL) 
+			if (fgets(line, 1023, file) == NULL)
 				memset(line, 0, 1024);
 			fclose(file);
 			c = strchr(line, '=');
@@ -69,8 +70,8 @@ void find_user(int argc, char **argv)
 				user = strdup(c);
 		}
 	}
-	/* pass 3: first user in /home */
 
+	/* pass 3: first user in /home */
 	if (!user) {
 		dir = opendir("/home");
 		while (dir) {
@@ -95,7 +96,7 @@ void find_user(int argc, char **argv)
 		user = strdup("moblin");
 
 	log_string("user found is:");
-	log_string(user);	
+	log_string(user);
 
 	/* translate user name to uid */
 	pass = getpwnam(user);
@@ -112,6 +113,27 @@ void find_user(int argc, char **argv)
  */
 void switch_to_user(void)
 {
+	char buf[80];
+	int result;
+
 	log_string("Entering switch_to_user");
+
+	initgroups(pass->pw_name, pass->pw_gid);
+
+	if (!((setgid(pass->pw_gid) == 0) && (setuid(pass->pw_uid) == 0)))
+		exit(1);
+
+	setsid();
+
+	/* start with a clean environ */
+	clearenv();
+
+	setenv("USER", pass->pw_name, 1);
+	setenv("LOGNAME", pass->pw_name, 1);
+	setenv("HOME", pass->pw_dir, 1);
+	setenv("SHELL", pass->pw_shell, 1);
+	sprintf(buf, "/var/spool/mail/%s", pass->pw_name);
+	setenv("MAIL", buf, 1);
+	result = chdir(pass->pw_dir);
 }
 
