@@ -70,7 +70,11 @@ void start_bash(void)
 
 void start_gconf(void)
 {
-	log_string("** Entering start_gconf");
+	int ret;
+	log_string("Entering start_gconf");
+	ret = system("gconftool-2 --spawn");
+	if (!ret)
+		log_string("failure to start gconftool-2");
 }
 
 
