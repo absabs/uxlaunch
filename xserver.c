@@ -101,7 +101,7 @@ void start_X_server(void)
 
 	/* Step 4: start the X server */
 	execl(xserver, xserver,  displayname, "-nr", "-verbose", xauth_cookie_file,
-	      "-nolisten", "-tcp", vt, NULL);
+	      "-nolisten", "tcp", vt, NULL);
 }
 
 void wait_for_X_signal(void)
