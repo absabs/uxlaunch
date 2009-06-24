@@ -115,6 +115,8 @@ void switch_to_user(void)
 {
 	char buf[80];
 	int result;
+	FILE *fp;
+	char fn[256];
 
 	log_string("Entering switch_to_user");
 
@@ -135,5 +137,14 @@ void switch_to_user(void)
 	sprintf(buf, "/var/spool/mail/%s", pass->pw_name);
 	setenv("MAIL", buf, 1);
 	result = chdir(pass->pw_dir);
+
+	/* redirect IO to .xsession-errors */
+	sprintf(fn, "%s/.xsession-errors", pass->pw_dir);
+	fp = fopen(fn, "w");
+	if (fp) {
+		fclose(fp);
+		fp = freopen(fn, "w", stdout);
+		fp = freopen(fn, "w", stderr);
+	}
 }
 
