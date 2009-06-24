@@ -15,12 +15,79 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <dirent.h>
 
 #include "uxlaunch.h"
 
+static void do_desktop_file(const char *filename)
+{
+	FILE *file;
+	char line[4096];
+	char exec[4096];
+	int show = 1;
+	int ret;
+
+	file = fopen(filename, "r");
+	if (!file)
+		return;
+
+	ret = fork();
+	if (ret)
+		return;
+
+	memset(exec, 0, 4096);
+	while (!feof(file)) {
+		if (fgets(line, 4096, file) == NULL)
+			break;
+		if (strstr(line, "Exec="))
+			strncpy(exec, line+5, 4095);
+
+		if (strstr(line, "OnlyShowIn"))
+			if (strstr(line, "MOBLIN") == NULL)
+				show = 0;
+
+		if (strstr(line, "NotShowIn")) {
+			if (strstr(line, "MOBLIN"))
+				show = 0;
+			if (strstr(line, "GNOME"))
+				show = 0;
+		}
+		
+	}
+	fclose(file);
+	if (show && strlen(exec)>0) {
+		ret = system(exec);
+		if (!ret) {
+			log_string("Failure doing autostart");
+		}
+	}
+		
+}
+
 void autostart_desktop_files(void)
 {
-	log_string("** Entering autostart_desktop_files");
+	DIR *dir;
+	struct dirent *entry;
+	log_string("Entering autostart_desktop_files");
+
+	dir = opendir("/etc/xdg/autostart");
+	if (!dir) {
+		log_string("Autostart directory not found");
+		return;
+	}	
+
+	while (1) {
+		char filename[PATH_MAX];
+		entry = readdir(dir);
+		if (entry->d_name[0] == '.')
+			continue;
+		if (entry->d_type != DT_REG)
+			continue;
+		sprintf(filename, "/etc/xdg/autostart/%s", entry->d_name);
+		do_desktop_file(filename);
+	}
 }
 
 void start_metacity(void)
