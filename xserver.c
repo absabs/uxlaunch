@@ -123,7 +123,7 @@ void start_X_server(void)
 		xserver = "/usr/bin/X";
 	if (!xserver) {
 		log_string("No X server found!");
-		return;
+		_exit(0);
 	}
 
 	sprintf(vt, "vt%d", vtnum);
@@ -131,11 +131,14 @@ void start_X_server(void)
 	/* Step 4: start the X server */
 	execl(xserver, xserver,  displayname, "-nr", "-verbose", xauth_cookie_file,
 	      "-nolisten", "tcp", vt, NULL);
+	_exit(0);
 }
 
 void wait_for_X_signal(void)
 {
 	log_string("Entering wait_for_X_signal");
+	sleep(2);
+	return; /* FIXME */
 	pthread_mutex_lock(&notify_mutex);
 	pthread_cond_wait(&notify_condition, &notify_mutex);
 	pthread_mutex_unlock(&notify_mutex);

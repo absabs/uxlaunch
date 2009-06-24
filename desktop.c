@@ -80,7 +80,6 @@ void autostart_desktop_files(void)
 		sprintf(filename, "/etc/xdg/autostart/%s", entry->d_name);
 		do_desktop_file(filename);
 	}
-	_exit(0);
 }
 
 void start_metacity(void)
