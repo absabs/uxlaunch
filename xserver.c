@@ -39,6 +39,11 @@ void find_display_and_tty(void)
 	log_string(msg);
 }
 
+void setup_xauth(void)
+{
+	log_string("** Entering setup_xauth");
+}
+
 static void usr1handler(int foo)
 {
 	/* Got the signal from the X server that it's ready */

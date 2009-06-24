@@ -26,9 +26,13 @@ int main(int argc, char **argv)
 	find_display_and_tty();
 
 	setup_pam_session();
+
+	setup_xauth();
+
 	switch_to_user();
 
 //	start_bash();
+
 
 	start_X_server();
 	wait_for_X_signal();
