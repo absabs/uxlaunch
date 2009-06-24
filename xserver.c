@@ -12,12 +12,15 @@
  * of the License.
  */
 
+#include <sys/ioctl.h>
 #include <unistd.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
 #include <pthread.h>
+#include <linux/tiocl.h>
 
 #include "uxlaunch.h"
 
@@ -26,24 +29,31 @@ char displayname[256] = ":0";	/* ":0" */
 int vtnum;	 		/* number part after /dev/tty */
 char xauth_cookie_file[256];    /* including an --auth prefix */
 
-
-
 static pthread_mutex_t notify_mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t notify_condition = PTHREAD_COND_INITIALIZER;
 
 
-void find_display_and_tty(void)
+void find_tty(void)
 {
-	int len;
+	int fd;
 	char msg[256];
+	int tiocl_sub = TIOCL_GETFGCONSOLE;
 
-	log_string("Entering find_display_and_tty");
+	log_string("Entering find_tty");
 
-	len = readlink("/proc/self/fd/0", displaydev, sizeof(displaydev) - 1);
-	if (len != -1)
-		displaydev[len] = '\0';
+	fd = open("/dev/tty", O_RDWR);
+	if (fd <= 0) {
+		log_string("Unable to open /dev/tty");
+		exit(1);
+	}
+	vtnum = ioctl(fd, TIOCLINUX, &tiocl_sub);
+	close(fd);
+	if (vtnum < 0) {
+		log_string("TIOCL_GETFGCONSOLE failed");
+		exit(1);
+	}
 
-	vtnum = atoi(displaydev + 8);
+	sprintf(displaydev, "/dev/tty%d", vtnum);
 
 	sprintf(msg, "tty = %s", displaydev);
 	log_string(msg);

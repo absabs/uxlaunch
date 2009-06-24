@@ -23,7 +23,7 @@ int main(int argc, char **argv)
 {
 
 	find_user(argc, argv);
-	find_display_and_tty();
+	find_tty();
 
 	setup_pam_session();
 
