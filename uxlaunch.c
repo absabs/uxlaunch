@@ -23,6 +23,31 @@ int main(int argc, char **argv)
 {
 	open_log();
 
+	/*
+	 * General objective:
+	 * Do the things that need root privs first,
+	 * then switch to the final user ASAP.
+	 *
+	 * Once we're at the target user ID, we need
+	 * to start X since that's the critical element
+	 * from that point on.
+	 *
+	 * While X is starting, we can do the things
+	 * that we need to do as the user UID, but that
+	 * don't need X running yet.
+	 *
+	 * We then wait for X to signal that it's ready
+	 * to draw stuff.
+	 * 
+	 * Once X is running, we set up the ConsoleKit session,
+	 * check if the screensaver needs to lock the screen
+	 * and then start the window manager.
+	 * After that we go over the autostart .desktop files
+	 * to launch the various autostart processes....
+	 * ... and we're done.
+	 */
+
+
 	find_user(argc, argv);
 	find_tty();
 
@@ -34,19 +59,25 @@ int main(int argc, char **argv)
 
 
 	start_X_server();
-	wait_for_X_signal();
 
+	/* 
+	 * These steps don't need X running
+	 * so can happen while X is talking to the
+	 * hardware
+	 */
 	start_dbus_session_bus();
-	setup_consolekit_session();
-
 	start_ssh_agent();
 	start_gconf();
 
+	wait_for_X_signal();
+
+	setup_consolekit_session();
+
 	maybe_start_screensaver();
 
-	autostart_desktop_files();
-
 	start_metacity();
+
+	autostart_desktop_files();
 
 	wait_for_X_exit();
 
