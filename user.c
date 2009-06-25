@@ -137,7 +137,8 @@ void switch_to_user(void)
 	snprintf(buf, 80, "/var/spool/mail/%s", pass->pw_name);
 	setenv("MAIL", buf, 1);
 	setenv("DISPLAY", displayname, 1);
-	setenv("PATH", "/usr/bin:/bin", 0);
+	snprintf(buf, 80, "/usr/local/bin:/bin:/usr/bin:%s/bin", pass->pw_dir);
+	setenv("PATH", buf, 1);
 	result = chdir(pass->pw_dir);
 
 	/* redirect further IO to .xsession-errors */
