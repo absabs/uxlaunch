@@ -9,7 +9,7 @@ CFLAGS += -Wall -W -Os -g -fstack-protector -D_FORTIFY_SOURCE=2 -Wformat -fno-co
 
 LDADD  += `pkg-config --libs dbus-1` \
 	  `pkg-config --libs ck-connector` \
-	  -lpam -lpthread -lrt
+	  -lpam -lpthread -lrt -lXau
 
 uxlaunch: $(OBJS) Makefile
 	gcc -o uxlaunch $(OBJS) $(LDADD)

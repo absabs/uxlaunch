@@ -13,6 +13,8 @@
  */
 
 #include <sys/ioctl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdio.h>
@@ -20,11 +22,16 @@
 #include <string.h>
 #include <signal.h>
 #include <pthread.h>
+#include <string.h>
 #include <linux/tiocl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/utsname.h>
+#include <pwd.h>
 
 #include "uxlaunch.h"
+
+#include <X11/Xauth.h>
 
 char displaydev[256];		/* "/dev/tty1" */
 char displayname[256] = ":0";	/* ":0" */
@@ -35,6 +42,9 @@ static pthread_mutex_t notify_mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t notify_condition = PTHREAD_COND_INITIALIZER;
 
 static int xpid;
+static Xauth x_auth;
+
+#define XAUTH_DIR "/var/run/uxlaunch"
 
 /*
  * We need to know the DISPLAY and TTY values to use, for passing
@@ -83,9 +93,16 @@ void find_tty(void)
 void setup_xauth(void)
 {
 	FILE *fp;
+	int fd;
 	char cookie[16];
 	char msg[80];
+	char template[80];
 	unsigned int i;
+	struct utsname uts;
+
+	char xau_address[80];
+	char xau_number[] = ":0";
+	char xau_name[] = "MIT-MAGIC-COOKIE-1";
 
 	log_string("** Entering setup_xauth");
 
@@ -94,6 +111,8 @@ void setup_xauth(void)
 		return;
 	if (fgets(cookie, sizeof(cookie), fp) == NULL)
 		return;
+	fclose(fp);
+
 	snprintf(msg, 80, "cookie = ");
 	for (i = 0; i < sizeof(cookie); i++) {
 		char c[256];
@@ -101,6 +120,51 @@ void setup_xauth(void)
 		strcat(msg, c);
 	}
 	log_string(msg);
+
+	/* construct xauth data */
+	if (uname(&uts) < 0) {
+		log_string("uname failed");
+		return;
+	}
+
+	sprintf(xau_address, "%s", uts.nodename);
+	x_auth.family = FamilyLocal;
+	x_auth.address = xau_address;
+	x_auth.number = xau_number;
+	x_auth.name = xau_name;
+	x_auth.address_length = strlen(xau_address);
+	x_auth.number_length = strlen(xau_number);
+	x_auth.name_length = strlen(xau_name);
+	x_auth.data = (char *) cookie;
+	x_auth.data_length = sizeof(cookie);
+
+
+	mkdir(XAUTH_DIR, 01755);
+	snprintf(template, 80, "%s/auth-for-%s-XXXXXX", XAUTH_DIR, pass->pw_name);
+	log_string(template);
+
+	fd = mkstemp(template);
+	if (fd <= 0) {
+		log_string("unable to make tmp file for xauth");
+		return;
+	}
+
+	fp = fdopen(fd, "a");
+	if (!fp) {
+		log_string("unable to open xauth fp");
+		close(fd);
+		return;
+	}
+
+	/* write it out to disk */
+	if (XauWriteAuth(fp, &x_auth) != 0) {
+		log_string("unable to write xauth data to disk");
+		fclose(fp);
+		close(fd);
+		return;
+	}
+	fclose(fp);
+	close(fd);
 }
 
 static void usr1handler(int foo)
