@@ -52,8 +52,8 @@ void find_tty(void)
 		vtnum = ioctl(fd, TIOCLINUX, &tiocl_sub);
 		close(fd);
 	} else {
-		log_string("Unable to open /dev/console");
-		exit(1);
+		log_string("Unable to open /dev/console, using stdin");
+		fd = 0;
 	}
 
 	if (vtnum < 0) {
@@ -70,6 +70,9 @@ void find_tty(void)
 	log_string(msg);
 	sprintf(msg, "vtnum = %d", vtnum);
 	log_string(msg);
+
+	if (fd)
+		close(fd);
 }
 
 void setup_xauth(void)
