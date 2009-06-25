@@ -149,5 +149,8 @@ void switch_to_user(void)
 		fp = freopen(fn, "w", stdout);
 		fp = freopen(fn, "w", stderr);
 	}
+
+	/* Create a new process group */
+	setpgrp();
 }
 
