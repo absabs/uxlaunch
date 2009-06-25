@@ -18,8 +18,21 @@
 #include <string.h>
 #include <sys/types.h>
 #include <dirent.h>
+#include <time.h>
 
 #include "uxlaunch.h"
+#if defined(__i386__)
+#  define __NR_ioprio_set 289
+#elif defined(__x86_64__)
+#  define __NR_ioprio_set 251
+#else
+#  error "Unsupported arch"
+#endif
+#define IOPRIO_WHO_PROCESS 1
+#define IOPRIO_CLASS_IDLE 3
+#define IOPRIO_CLASS_SHIFT 13
+#define IOPRIO_IDLE_LOWEST (7 | (IOPRIO_CLASS_IDLE << IOPRIO_CLASS_SHIFT))
+
 
 /*
  * Process a .desktop file
@@ -37,6 +50,7 @@ static void do_desktop_file(const char *filename)
 	char line[4096];
 	char exec[4096];
 	int show = 1;
+	static int counter = 0;
 
 	file = fopen(filename, "r");
 	if (!file)
@@ -68,12 +82,26 @@ static void do_desktop_file(const char *filename)
 	fclose(file);
 	if (show && strlen(exec)>0) {
 		char msg[4096];
+		char *ptrs[256];
+		int count = 0;
 		snprintf(msg, 4096, "Starting -%s-", exec);
 		log_string(msg);
 		/* FIXME: split the arguments and do an execlp or so instead */
 		if (!fork()) {
 			int ret;
-			ret = system(exec);
+			syscall(__NR_ioprio_set, IOPRIO_WHO_PROCESS, 0, IOPRIO_IDLE_LOWEST);
+			ret = nice(5);
+
+			memset(ptrs, 0, sizeof(ptrs));
+
+			ptrs[0] = strtok(exec, " \t");
+			while (ptrs[count] && count < 255) {
+				ptrs[++count] = strtok(NULL, " \t");
+			}
+
+			counter ++;
+			usleep(50000 * counter);
+			execvp(ptrs[0], ptrs);
 			exit(ret);
 		}
 	}
@@ -118,7 +146,12 @@ void start_metacity(void)
 	int ret;
 	log_string("Entering start_metacity");
 
-	ret = system("/usr/bin/metacity");
+	ret = fork();
+
+	if (ret)
+		return; /* parent continues */
+
+	ret = execl("/usr/bin/metacity", "/usr/bin/metacity", NULL);
 	if (ret != EXIT_SUCCESS) 
 		log_string("Failure to start metacity");
 }

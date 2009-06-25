@@ -21,6 +21,8 @@
 #include <signal.h>
 #include <pthread.h>
 #include <linux/tiocl.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 #include "uxlaunch.h"
 
@@ -32,6 +34,7 @@ char xauth_cookie_file[256];    /* including an --auth prefix */
 static pthread_mutex_t notify_mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t notify_condition = PTHREAD_COND_INITIALIZER;
 
+static int xpid;
 
 /*
  * We need to know the DISPLAY and TTY values to use, for passing
@@ -136,8 +139,10 @@ void start_X_server(void)
 	/* Step 2: fork */
 
 	ret = fork();
-	if (ret)
+	if (ret) {
+		xpid = ret;
 		return; /* we're the main thread */
+	}
 
 	/* if we get here we're the child */
 
@@ -163,7 +168,7 @@ void start_X_server(void)
 	/* Step 4: start the X server */
 	execl(xserver, xserver,  displayname, "-nr", "-verbose", xauth_cookie_file,
 	      "-nolisten", "tcp", vt, NULL);
-	_exit(EXIT_FAILURE);
+	exit(0);
 }
 
 /*
@@ -184,3 +189,14 @@ void wait_for_X_signal(void)
 
 }
  
+void wait_for_X_exit(void)
+{	
+	int ret;
+	log_string("wait_for_X_exit");
+	while (1) {
+		ret = waitpid(0, NULL, 0);
+		if (ret == xpid)
+			break;
+	}
+	log_string("X exited");
+}

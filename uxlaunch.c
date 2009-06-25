@@ -48,9 +48,9 @@ int main(int argc, char **argv)
 
 	start_metacity();
 
-	// FIXME - start wm in foreground, wait for it to die
-	// fork .desktop file startup in background thread
-	// then when wm dies, close session stuff properly:
+	wait_for_X_exit();
+
+
 	// close_consolekit_session();
 	stop_dbus_session_bus();
 	close_pam_session();
