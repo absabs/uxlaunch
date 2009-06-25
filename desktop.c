@@ -100,7 +100,7 @@ static void do_desktop_file(const char *filename)
 			}
 
 			counter ++;
-			usleep(50 * counter);
+			usleep(100 * counter);
 			execvp(ptrs[0], ptrs);
 			exit(ret);
 		}
