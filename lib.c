@@ -34,6 +34,7 @@ struct timeval start;
 
 static FILE *log;
 
+
 void open_log(void)
 {
 	/* truncate log */

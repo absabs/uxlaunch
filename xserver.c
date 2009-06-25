@@ -140,14 +140,16 @@ void setup_xauth(void)
 
 
 	mkdir(XAUTH_DIR, 01755);
-	snprintf(template, 80, "%s/auth-for-%s-XXXXXX", XAUTH_DIR, pass->pw_name);
-	log_string(template);
+	snprintf(template, 80, "%s/Xauth-%s-XXXXXX", XAUTH_DIR, pass->pw_name);
 
 	fd = mkstemp(template);
 	if (fd <= 0) {
 		log_string("unable to make tmp file for xauth");
 		return;
 	}
+
+	log_string(template);
+	snprintf(xauth_cookie_file, 256, "--auth %s", template);
 
 	fp = fdopen(fd, "a");
 	if (!fp) {
@@ -157,7 +159,7 @@ void setup_xauth(void)
 	}
 
 	/* write it out to disk */
-	if (XauWriteAuth(fp, &x_auth) != 0) {
+	if (XauWriteAuth(fp, &x_auth) != 1) {
 		log_string("unable to write xauth data to disk");
 		fclose(fp);
 		close(fd);
