@@ -166,12 +166,15 @@ void start_X_server(void)
  */
 void wait_for_X_signal(void)
 {
+	struct timespec tv;
 	log_string("Entering wait_for_X_signal");
-	sleep(2);
-	return; /* FIXME */
+	clock_gettime(CLOCK_REALTIME, &tv);
+	tv.tv_sec += 2;
+
 	pthread_mutex_lock(&notify_mutex);
-	pthread_cond_wait(&notify_condition, &notify_mutex);
+	pthread_cond_timedwait(&notify_condition, &notify_mutex, &tv);
 	pthread_mutex_unlock(&notify_mutex);
+	log_string("done");
 
 }
  
