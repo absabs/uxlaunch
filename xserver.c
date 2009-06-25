@@ -190,8 +190,13 @@ void wait_for_X_signal(void)
 }
  
 void wait_for_X_exit(void)
-{
+{	
+	int ret;
 	log_string("wait_for_X_exit");
-	waitpid(xpid, NULL, 0);
+	while (1) {
+		ret = waitpid(0, NULL, 0);
+		if (ret == xpid)
+			break;
+	}
 	log_string("X exited");
 }
