@@ -41,12 +41,12 @@ void find_tty(void)
 
 	log_string("Entering find_tty");
 
-	fd = open("/dev/tty", O_RDWR);
+	fd = open("/dev/console", O_RDWR);
 	if (fd >= 0) {
 		vtnum = ioctl(fd, TIOCLINUX, &tiocl_sub);
 		close(fd);
 	} else {
-		log_string("Unable to open /dev/tty");
+		log_string("Unable to open /dev/console");
 		exit(1);
 	}
 
@@ -54,6 +54,9 @@ void find_tty(void)
 		log_string("TIOCL_GETFGCONSOLE failed");
 		exit(1);
 	}
+
+	/* kernel starts counting at 0 */
+	vtnum++;
 
 	sprintf(displaydev, "/dev/tty%d", vtnum);
 
