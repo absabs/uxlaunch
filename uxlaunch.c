@@ -15,6 +15,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
 
 #include "uxlaunch.h"
 
@@ -85,6 +86,9 @@ int main(int argc, char **argv)
 	// close_consolekit_session();
 	stop_dbus_session_bus();
 	close_pam_session();
+
+	/* Make sure that we clean up after ourselves */
+	kill(0, SIGTERM);
 
 	return EXIT_SUCCESS; 
 }
