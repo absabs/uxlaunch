@@ -18,6 +18,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <dirent.h>
+#include <time.h>
 
 #include "uxlaunch.h"
 
@@ -37,6 +38,7 @@ static void do_desktop_file(const char *filename)
 	char line[4096];
 	char exec[4096];
 	int show = 1;
+	static int counter = 0;
 
 	file = fopen(filename, "r");
 	if (!file)
@@ -73,6 +75,9 @@ static void do_desktop_file(const char *filename)
 		/* FIXME: split the arguments and do an execlp or so instead */
 		if (!fork()) {
 			int ret;
+
+			counter ++;
+			usleep(50 * counter);
 			ret = system(exec);
 			exit(ret);
 		}
