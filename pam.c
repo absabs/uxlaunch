@@ -39,7 +39,7 @@ void setup_pam_session(void)
 	char x[256];
 	int err;
 
-	log_string("** Entering setup_pam_session");
+	log_string("Entering setup_pam_session");
 
 	snprintf(x, 256, "tty%d", vtnum);
 
@@ -72,7 +72,7 @@ void close_pam_session(void)
 	char msg[256];
 	int err;
 
-	log_string("** Entering close_pam_session");
+	log_string("Entering close_pam_session");
 
 	err = pam_close_session(ph, 0);
 	if (err) {
