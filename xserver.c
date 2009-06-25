@@ -37,17 +37,19 @@ void find_tty(void)
 {
 	int fd;
 	char msg[256];
-	int tiocl_sub = TIOCL_GETFGCONSOLE;
+	unsigned char tiocl_sub = TIOCL_GETFGCONSOLE;
 
 	log_string("Entering find_tty");
 
 	fd = open("/dev/tty", O_RDWR);
-	if (fd <= 0) {
+	if (fd >= 0) {
+		vtnum = ioctl(fd, TIOCLINUX, &tiocl_sub);
+		close(fd);
+	} else {
 		log_string("Unable to open /dev/tty");
 		exit(1);
 	}
-	vtnum = ioctl(fd, TIOCLINUX, &tiocl_sub);
-	close(fd);
+
 	if (vtnum < 0) {
 		log_string("TIOCL_GETFGCONSOLE failed");
 		exit(1);
