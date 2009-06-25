@@ -36,7 +36,7 @@
 char displaydev[256];		/* "/dev/tty1" */
 char displayname[256] = ":0";	/* ":0" */
 int vtnum;	 		/* number part after /dev/tty */
-char xauth_cookie_file[256];    /* including an --auth prefix */
+char xauth_cookie_file[256];
 
 static pthread_mutex_t notify_mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t notify_condition = PTHREAD_COND_INITIALIZER;
@@ -96,7 +96,6 @@ void setup_xauth(void)
 	int fd;
 	char cookie[16];
 	char msg[80];
-	char template[80];
 	unsigned int i;
 	struct utsname uts;
 
@@ -140,18 +139,17 @@ void setup_xauth(void)
 
 
 	mkdir(XAUTH_DIR, 01755);
-	snprintf(template, 80, "%s/Xauth-%s-XXXXXX", XAUTH_DIR, pass->pw_name);
+	snprintf(xauth_cookie_file, 80, "%s/Xauth-%s-XXXXXX", XAUTH_DIR, pass->pw_name);
 
-	fd = mkstemp(template);
+	fd = mkstemp(xauth_cookie_file);
 	if (fd <= 0) {
 		log_string("unable to make tmp file for xauth");
 		return;
 	}
 
-	log_string(template);
-	snprintf(xauth_cookie_file, 256, "--auth %s", template);
+	log_string(xauth_cookie_file);
 
-	setenv("XAUTHORITY", template, 1);
+	setenv("XAUTHORITY", xauth_cookie_file, 1);
 
 	fp = fdopen(fd, "a");
 	if (!fp) {
@@ -234,7 +232,7 @@ void start_X_server(void)
 	snprintf(vt, 80, "vt%d", vtnum);
 
 	/* Step 4: start the X server */
-	execl(xserver, xserver,  displayname, "-nr", "-verbose", xauth_cookie_file,
+	execl(xserver, xserver,  displayname, "-nr", "-verbose", "-auth", xauth_cookie_file,
 	      "-nolisten", "tcp", vt, NULL);
 	exit(0);
 }
