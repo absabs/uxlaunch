@@ -32,20 +32,25 @@ static int logfile_enabled = 1;
 
 struct timeval start;
 
+static FILE *log;
+
+void open_log(void)
+{
+	/* truncate log */
+	log = fopen(LOGFILE, "w");
+	if (!log)
+		logfile_enabled = 0;
+}
+
 void log_string(char *string)
 {
 	struct timeval current;
 	uint64_t secs, usecs;
 	char msg[8192];
-	FILE *log;
 
 	if (first_time) {
 		first_time = 0;
 		gettimeofday(&start, NULL);
-		/* truncate log */
-		log = fopen(LOGFILE, "w");
-		if (log)
-			fclose(log);
 	}
 
 	gettimeofday(&current, NULL);
@@ -66,10 +71,8 @@ void log_string(char *string)
 	if (!logfile_enabled)
 		return;
 
-	log = fopen(LOGFILE, "a");
 	if (log) {
 		fputs(msg, log);
-		fclose(log);
 	} else {
 		logfile_enabled = 0;
 		log_string("Unable to write logfile");

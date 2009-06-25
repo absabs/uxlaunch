@@ -21,6 +21,7 @@
 
 int main(int argc, char **argv)
 {
+	open_log();
 
 	find_user(argc, argv);
 	find_tty();

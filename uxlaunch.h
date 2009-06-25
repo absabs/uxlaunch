@@ -31,7 +31,7 @@ extern void start_metacity(void);
 extern void autostart_desktop_files(void);
 extern void start_bash(void);
 
-
+extern void open_log(void);
 extern void log_string(char *string);
 extern void log_environment(void);
 
