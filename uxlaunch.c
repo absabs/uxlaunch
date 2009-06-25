@@ -88,7 +88,7 @@ int main(int argc, char **argv)
 	close_pam_session();
 
 	/* Make sure that we clean up after ourselves */
-	//kill(0, SIGTERM);
+	kill(0, SIGTERM);
 
 	return EXIT_SUCCESS; 
 }
