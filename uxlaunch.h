@@ -1,6 +1,7 @@
 #ifndef __INCLUDE_GUARD_UXLAUNCH_
 #define __INCLUDE_GUARD_UXLAUNCH_
 
+#include <X11/Xauth.h>
 
 /*
  * Target user information
@@ -12,6 +13,8 @@ extern int   uid;
 extern char displaydev[];
 extern char displayname[];
 extern int  vtnum;
+extern char xauth_cookie_file[];
+extern Xauth x_auth;
 
 extern void find_user(int argc, char **argv);
 extern void setup_pam_session(void);

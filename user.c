@@ -24,9 +24,14 @@
 
 #include "uxlaunch.h"
 
+#include <X11/Xauth.h>
+
 char *user;
 int uid;
 struct passwd *pass;
+
+static char user_xauth_path[PATH_MAX];
+
 
 /*
  * This function needs to find the user name and UID/GID of the user
@@ -139,7 +144,18 @@ void switch_to_user(void)
 	setenv("DISPLAY", displayname, 1);
 	snprintf(buf, 80, "/usr/local/bin:/bin:/usr/bin:%s/bin", pass->pw_dir);
 	setenv("PATH", buf, 1);
+	snprintf(user_xauth_path, PATH_MAX, "%s/.Xauthority", pass->pw_dir);
+	setenv("XAUTHORITY", user_xauth_path, 1);
+
 	result = chdir(pass->pw_dir);
+
+	fp = fopen(user_xauth_path, "w");
+	if (fp) {
+		if (XauWriteAuth(fp, &x_auth) != 1) {
+			log_string("Unable to write .Xauthority");
+		}
+		fclose(fp);
+	}
 
 	/* redirect further IO to .xsession-errors */
 	snprintf(fn, 255, "%s/.xsession-errors", pass->pw_dir);
@@ -151,6 +167,6 @@ void switch_to_user(void)
 	}
 
 	/* Create a new process group */
-	setpgrp();
+//	setpgrp();
 }
 

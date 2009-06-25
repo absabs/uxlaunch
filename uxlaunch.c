@@ -61,7 +61,7 @@ int main(int argc, char **argv)
 
 	start_X_server();
 
-	/* 
+	/*
 	 * These steps don't need X running
 	 * so can happen while X is talking to the
 	 * hardware
@@ -88,7 +88,7 @@ int main(int argc, char **argv)
 	close_pam_session();
 
 	/* Make sure that we clean up after ourselves */
-	kill(0, SIGTERM);
+	//kill(0, SIGTERM);
 
 	return EXIT_SUCCESS; 
 }

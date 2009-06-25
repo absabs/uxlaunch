@@ -37,12 +37,13 @@ char displaydev[256];		/* "/dev/tty1" */
 char displayname[256] = ":0";	/* ":0" */
 int vtnum;	 		/* number part after /dev/tty */
 char xauth_cookie_file[256];
+Xauth x_auth;
+Xauth user_xauth;
 
 static pthread_mutex_t notify_mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t notify_condition = PTHREAD_COND_INITIALIZER;
 
 static int xpid;
-static Xauth x_auth;
 
 #define XAUTH_DIR "/var/run/uxlaunch"
 
@@ -99,9 +100,9 @@ void setup_xauth(void)
 	unsigned int i;
 	struct utsname uts;
 
-	char xau_address[80];
-	char xau_number[] = ":0"; // FIXME, detect correct displaynum
-	char xau_name[] = "MIT-MAGIC-COOKIE-1";
+	static char xau_address[80];
+	static char xau_number[] = "0"; // FIXME, detect correct displaynum
+	static char xau_name[] = "MIT-MAGIC-COOKIE-1";
 
 	log_string("** Entering setup_xauth");
 
@@ -148,8 +149,6 @@ void setup_xauth(void)
 	}
 
 	log_string(xauth_cookie_file);
-
-	setenv("XAUTHORITY", xauth_cookie_file, 1);
 
 	fp = fdopen(fd, "a");
 	if (!fp) {
