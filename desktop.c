@@ -21,6 +21,18 @@
 #include <time.h>
 
 #include "uxlaunch.h"
+#if defined(__i386__)
+#  define __NR_ioprio_set 289
+#elif defined(__x86_64__)
+#  define __NR_ioprio_set 251
+#else
+#  error "Unsupported arch"
+#endif
+#define IOPRIO_WHO_PROCESS 1
+#define IOPRIO_CLASS_IDLE 3
+#define IOPRIO_CLASS_SHIFT 13
+#define IOPRIO_IDLE_LOWEST (7 | (IOPRIO_CLASS_IDLE << IOPRIO_CLASS_SHIFT))
+
 
 /*
  * Process a .desktop file
@@ -75,6 +87,7 @@ static void do_desktop_file(const char *filename)
 		/* FIXME: split the arguments and do an execlp or so instead */
 		if (!fork()) {
 			int ret;
+			syscall(__NR_ioprio_set, IOPRIO_WHO_PROCESS, 0, IOPRIO_IDLE_LOWEST);
 
 			counter ++;
 			usleep(50 * counter);
