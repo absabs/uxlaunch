@@ -31,8 +31,6 @@ int main(int argc, char **argv)
 
 	switch_to_user();
 
-//	start_bash();
-
 
 	start_X_server();
 	wait_for_X_signal();
@@ -52,10 +50,6 @@ int main(int argc, char **argv)
 	// FIXME - start wm in foreground, wait for it to die
 	// fork .desktop file startup in background thread
 	// then when wm dies, close session stuff properly:
-
-	while(1)
-		sleep(100000);
-
 	// close_consolekit_session();
 	stop_dbus_session_bus();
 	close_pam_session();

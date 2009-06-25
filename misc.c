@@ -36,6 +36,16 @@ void start_ssh_agent(void)
 		log_string("!! Failed to start ssh-agent");
 		return;
 	}
+	/*
+	 * ssh-agent output looks like this:
+	 *
+	 * SSH_AUTH_SOCK=/tmp/ssh-ccZMs16230/agent.16230; export SSH_AUTH_SOCK;
+ 	 * SSH_AGENT_PID=16231; export SSH_AGENT_PID;
+ 	 * echo Agent pid 16231;
+	 * 
+	 * so search for "; export", cut that off. Then split at the = for env var name
+	 * and value.
+	 */
 	while (!feof(file)) {
 		char *c;
 		if (fgets(line, 4095, file)==NULL)
@@ -56,6 +66,9 @@ void start_ssh_agent(void)
 	log_environment();
 }
 
+/*
+ * helper function to make debug easier
+ */
 void start_bash(void)
 {
 	int ret;
@@ -68,6 +81,10 @@ void start_bash(void)
 		log_string("bash returned an error");
 }
 
+/*
+ * We want to start gconf early, by hand, so that it can start processing the
+ * XML well before someone needs it to cut down the total time
+ */
 void start_gconf(void)
 {
 	int ret;
@@ -80,6 +97,7 @@ void start_gconf(void)
 
 void maybe_start_screensaver(void)
 {
+	/* FIXME: to do */
 	log_string("** Entering maybe_start_screensaver");
 }
 

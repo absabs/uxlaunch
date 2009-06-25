@@ -21,6 +21,16 @@
 
 #include "uxlaunch.h"
 
+/*
+ * Process a .desktop file
+ * Objective: fine the "Exec=" line which has the command to run
+ * Constraints:
+ *   if there is a OnlyShowIn line, then it must contain the string "MOBLIN"
+ *   (this is to allow moblin-only settings apps to show up, but not gnome settings apps)
+ *   if there is a NotShowIn line, it must not contain "MOBLIN" or "GNOME"
+ *   (this allows KDE etc systems to hide stuff for GNOME as they do today and not show it
+ *    on moblin)
+ */
 static void do_desktop_file(const char *filename)
 {
 	FILE *file;
@@ -60,6 +70,7 @@ static void do_desktop_file(const char *filename)
 		char msg[4096];
 		sprintf(msg, "Starting -%s-", exec);
 		log_string(msg);
+		/* FIXME: split the arguments and do an execlp or so instead */
 		if (!fork()) {
 			system(exec);
 			exit(0);
@@ -67,6 +78,10 @@ static void do_desktop_file(const char *filename)
 	}
 }
 
+/*
+ * We need to process all the .desktop files in /etc/xdg/autostart.
+ * Simply walk the directory 
+ */
 void autostart_desktop_files(void)
 {
 	DIR *dir;
@@ -89,9 +104,12 @@ void autostart_desktop_files(void)
 			continue;
 		if (entry->d_type != DT_REG)
 			continue;
+		if (strchr(entry->d_name, '~')) 
+			continue;  /* editor backup file */
 		sprintf(filename, "/etc/xdg/autostart/%s", entry->d_name);
 		do_desktop_file(filename);
 	}
+	closedir(dir);
 }
 
 void start_metacity(void)

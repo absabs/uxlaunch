@@ -108,7 +108,7 @@ void find_user(int argc, char **argv)
  * Change from root (as we started) to the target user.
  * Steps
  * 1) setuid/getgid
- * 2) env variables: HOME, MAIL, LOGNAME
+ * 2) env variables: HOME, MAIL, LOGNAME, USER, SHELL, DISPLAY and PATH
  * 3) chdir(/home/foo);
  */
 void switch_to_user(void)
@@ -140,9 +140,7 @@ void switch_to_user(void)
 	setenv("PATH", "/usr/bin:/bin", 0);
 	result = chdir(pass->pw_dir);
 
-	return;
-
-	/* redirect IO to .xsession-errors */
+	/* redirect further IO to .xsession-errors */
 	sprintf(fn, "%s/.xsession-errors", pass->pw_dir);
 	fp = fopen(fn, "w");
 	if (fp) {

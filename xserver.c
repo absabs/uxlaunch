@@ -33,6 +33,12 @@ static pthread_mutex_t notify_mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t notify_condition = PTHREAD_COND_INITIALIZER;
 
 
+/*
+ * We need to know the DISPLAY and TTY values to use, for passing
+ * to PAM, ConsoleKit but also X.
+ * TIOCLINUX will tell us which console is currently showing
+ * for this purpose.
+ */
 void find_tty(void)
 {
 	int fd;
@@ -149,6 +155,10 @@ void start_X_server(void)
 	_exit(0);
 }
 
+/*
+ * The X server will send us a SIGUSR1 when it's ready to serve clients,
+ * wait for this.
+ */
 void wait_for_X_signal(void)
 {
 	log_string("Entering wait_for_X_signal");

@@ -24,6 +24,15 @@
 pam_handle_t *ph;
 struct pam_conv pc;
 
+/*
+ * Creating a PAM session. We need a pam "login" session so that the dbus
+ * "at_console" logic will work correctly, as well as various /dev file
+ * permissions.
+ * 
+ * for pam_console to work we need to set the PAM_TTY and PAM_XDISPLAY variables,
+ * before we open the session. "PAM_TTY" takes input in the form "ttyX", without
+ * the /dev prefix, so we need to construct that in place here.
+ */
 void setup_pam_session(void)
 {
 	char msg[256];

@@ -26,6 +26,17 @@
 static CkConnector *connector = NULL;
 
 
+/*
+ * Set up a ConsoleKit session. This is as easy as calling
+ * one ck_connector function; the tricky part is that we
+ * need to pass ConsoleKit the value of our X display ( :0 )
+ * as well as the /dev/ttyX we're connected to.
+ * These are needed so that ConsoleKit can set the "active"
+ * flag on and off as you switch between consoles or X sessions.
+ *
+ * The outcome of this is a cookie which we need to put in the
+ * XDG_SESSION_COOKIE environment variable.
+ */
 void setup_consolekit_session(void)
 {
 	DBusError error;
@@ -38,11 +49,13 @@ void setup_consolekit_session(void)
 	if (!connector)
 		exit(1);
 
-fprintf(stderr, "d=%s\n", displaydev);
-fprintf(stderr, "n=%s\n", displayname);
-
 	dbus_error_init(&error);
-	// FIXME - open session with parameters instead
+
+	/*
+	 * Note: ck_connector_open_* require a pointer to the value,
+	 * even if the value is a string. So for a string you need
+	 * to pass in a address that contains a pointer to the string.
+	 */
 	if (!ck_connector_open_session_with_parameters(connector, &error,
 						       "unix-user", &uid,
 						       "display-device", &d,
@@ -51,15 +64,21 @@ fprintf(stderr, "n=%s\n", displayname);
 						       NULL)) {
 		printf("Error: Unable to open session with ConsoleKit: %s: %s\n",
 			error.name, error.message);
-		exit(1);
+		return;
 	}
 
+	/*
+	 * put the session cookie up as an environment variable
+	 */
 	setenv("XDG_SESSION_COOKIE", ck_connector_get_cookie(connector), 1);
 
 	log_environment();
 }
 
 
+/*
+ * Undo the effects of setup_consolekit_sessions on shutdown
+ */
 void close_consolekit_session(void)
 {
 	log_string("Entering close_consolekit_session");
