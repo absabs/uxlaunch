@@ -146,7 +146,12 @@ void start_metacity(void)
 	int ret;
 	log_string("Entering start_metacity");
 
-	ret = system("/usr/bin/metacity");
+	ret = fork();
+
+	if (ret)
+		return; /* parent continues */
+
+	ret = execl("/usr/bin/metacity", "/usr/bin/metacity", NULL);
 	if (ret != EXIT_SUCCESS) 
 		log_string("Failure to start metacity");
 }
