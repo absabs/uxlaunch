@@ -58,17 +58,17 @@ void find_tty(void)
 
 	if (vtnum < 0) {
 		log_string("TIOCL_GETFGCONSOLE failed");
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 
 	/* kernel starts counting at 0 */
 	vtnum++;
 
-	sprintf(displaydev, "/dev/tty%d", vtnum);
+	snprintf(displaydev, 255, "/dev/tty%d", vtnum);
 
-	sprintf(msg, "tty = %s", displaydev);
+	snprintf(msg, 255, "tty = %s", displaydev);
 	log_string(msg);
-	sprintf(msg, "vtnum = %d", vtnum);
+	snprintf(msg, 255, "vtnum = %d", vtnum);
 	log_string(msg);
 
 	if (fd)
@@ -89,10 +89,10 @@ void setup_xauth(void)
 		return;
 	if (fgets(cookie, sizeof(cookie), fp) == NULL)
 		return;
-	sprintf(msg, "cookie = ");
+	snprintf(msg, 80, "cookie = ");
 	for (i = 0; i < sizeof(cookie); i++) {
 		char c[256];
-		sprintf(c, "%02x", (unsigned char)cookie[i]);
+		snprintf(c, 256, "%02x", (unsigned char)cookie[i]);
 		strcat(msg, c);
 	}
 	log_string(msg);
@@ -147,15 +147,15 @@ void start_X_server(void)
 		xserver = "/usr/bin/X";
 	if (!xserver) {
 		log_string("No X server found!");
-		_exit(0);
+		_exit(EXIT_FAILURE);
 	}
 
-	sprintf(vt, "vt%d", vtnum);
+	snprintf(vt, 80, "vt%d", vtnum);
 
 	/* Step 4: start the X server */
 	execl(xserver, xserver,  displayname, "-nr", "-verbose", xauth_cookie_file,
 	      "-nolisten", "tcp", vt, NULL);
-	_exit(0);
+	_exit(EXIT_FAILURE);
 }
 
 /*

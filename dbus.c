@@ -31,22 +31,23 @@ void start_dbus_session_bus(void)
 	int p_fd[2];
 	int a_fd[2];
 	char cmd[255];
-	int result;
+	int ret;
+	ssize_t result;
 
 	log_string("Entering start_dbus_session_bus");
 
 	if (pipe(p_fd) < 0)
-		exit(1);
+		exit(EXIT_FAILURE);
 	if (pipe(a_fd) < 0) {
 		close(p_fd[0]);
 		close(p_fd[1]);
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 
-	sprintf(cmd, "dbus-daemon --fork --session --print-pid %d --print-address %d",
+	snprintf(cmd, 254, "dbus-daemon --fork --session --print-pid %d --print-address %d",
 		p_fd[1], a_fd[1]);
 
-	result = system(cmd);
+	ret = system(cmd);
 
 	close(p_fd[1]);
 	close(a_fd[1]);

@@ -47,7 +47,7 @@ void setup_consolekit_session(void)
 
 	connector = ck_connector_new();
 	if (!connector)
-		exit(1);
+		exit(EXIT_FAILURE);
 
 	dbus_error_init(&error);
 

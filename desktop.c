@@ -68,7 +68,7 @@ static void do_desktop_file(const char *filename)
 	fclose(file);
 	if (show && strlen(exec)>0) {
 		char msg[4096];
-		sprintf(msg, "Starting -%s-", exec);
+		snprintf(msg, 4096, "Starting -%s-", exec);
 		log_string(msg);
 		/* FIXME: split the arguments and do an execlp or so instead */
 		if (!fork()) {
@@ -106,7 +106,7 @@ void autostart_desktop_files(void)
 			continue;
 		if (strchr(entry->d_name, '~')) 
 			continue;  /* editor backup file */
-		sprintf(filename, "/etc/xdg/autostart/%s", entry->d_name);
+		snprintf(filename, 4096, "/etc/xdg/autostart/%s", entry->d_name);
 		do_desktop_file(filename);
 	}
 	closedir(dir);

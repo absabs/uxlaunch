@@ -48,7 +48,7 @@ void find_user(int argc, char **argv)
 
 	/* pass 1: find --user on the command line */
 	for (i = 0; i < argc -1 ; i++) {
-		if (strcmp(argv[i], "--user") == 0) {
+		if (!user && strcmp(argv[i], "--user") == 0) {
 			user = strdup(argv[i+1]);
 		}
 	}
@@ -123,7 +123,7 @@ void switch_to_user(void)
 	initgroups(pass->pw_name, pass->pw_gid);
 
 	if (!((setgid(pass->pw_gid) == 0) && (setuid(pass->pw_uid) == 0)))
-		exit(1);
+		exit(EXIT_FAILURE);
 
 	setsid();
 
@@ -134,14 +134,14 @@ void switch_to_user(void)
 	setenv("LOGNAME", pass->pw_name, 1);
 	setenv("HOME", pass->pw_dir, 1);
 	setenv("SHELL", pass->pw_shell, 1);
-	sprintf(buf, "/var/spool/mail/%s", pass->pw_name);
+	snprintf(buf, 80, "/var/spool/mail/%s", pass->pw_name);
 	setenv("MAIL", buf, 1);
 	setenv("DISPLAY", displayname, 1);
 	setenv("PATH", "/usr/bin:/bin", 0);
 	result = chdir(pass->pw_dir);
 
 	/* redirect further IO to .xsession-errors */
-	sprintf(fn, "%s/.xsession-errors", pass->pw_dir);
+	snprintf(fn, 255, "%s/.xsession-errors", pass->pw_dir);
 	fp = fopen(fn, "w");
 	if (fp) {
 		fclose(fp);
