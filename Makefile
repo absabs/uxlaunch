@@ -13,6 +13,7 @@ LDADD  += `pkg-config --libs dbus-1` \
 uxlaunch: $(OBJS) Makefile
 	gcc -o uxlaunch $(OBJS) $(LDADD)
 
+.SILENT:
 
 clean:
 	rm -rf *.o *~ uxlaunch
