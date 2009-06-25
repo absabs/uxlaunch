@@ -82,16 +82,26 @@ static void do_desktop_file(const char *filename)
 	fclose(file);
 	if (show && strlen(exec)>0) {
 		char msg[4096];
+		char *ptrs[256];
+		int count = 0;
 		snprintf(msg, 4096, "Starting -%s-", exec);
 		log_string(msg);
 		/* FIXME: split the arguments and do an execlp or so instead */
 		if (!fork()) {
 			int ret;
 			syscall(__NR_ioprio_set, IOPRIO_WHO_PROCESS, 0, IOPRIO_IDLE_LOWEST);
+			ret = nice(5);
+
+			memset(ptrs, 0, sizeof(ptrs));
+
+			ptrs[0] = strtok(exec, " \t");
+			while (ptrs[count] && count < 255) {
+				ptrs[++count] = strtok(NULL, " \t");
+			}
 
 			counter ++;
 			usleep(50 * counter);
-			ret = system(exec);
+			execvp(ptrs[0], ptrs);
 			exit(ret);
 		}
 	}
