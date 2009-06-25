@@ -86,7 +86,7 @@ static void do_desktop_file(const char *filename)
 		int count = 0;
 		snprintf(msg, 4096, "Starting -%s-", exec);
 		log_string(msg);
-		/* FIXME: split the arguments and do an execlp or so instead */
+
 		if (!fork()) {
 			int ret;
 			syscall(__NR_ioprio_set, IOPRIO_WHO_PROCESS, 0, IOPRIO_IDLE_LOWEST);
