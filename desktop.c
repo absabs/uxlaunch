@@ -72,8 +72,9 @@ static void do_desktop_file(const char *filename)
 		log_string(msg);
 		/* FIXME: split the arguments and do an execlp or so instead */
 		if (!fork()) {
-			system(exec);
-			exit(0);
+			int ret;
+			ret = system(exec);
+			exit(ret);
 		}
 	}
 }
