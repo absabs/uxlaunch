@@ -101,7 +101,7 @@ void setup_xauth(void)
 	struct utsname uts;
 
 	char xau_address[80];
-	char xau_number[] = ":0";
+	char xau_number[] = ":0"; // FIXME, detect correct displaynum
 	char xau_name[] = "MIT-MAGIC-COOKIE-1";
 
 	log_string("** Entering setup_xauth");
@@ -150,6 +150,8 @@ void setup_xauth(void)
 
 	log_string(template);
 	snprintf(xauth_cookie_file, 256, "--auth %s", template);
+
+	setenv("XAUTHORITY", template, 1);
 
 	fp = fdopen(fd, "a");
 	if (!fp) {
