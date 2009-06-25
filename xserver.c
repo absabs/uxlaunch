@@ -143,6 +143,12 @@ void start_X_server(void)
 
 	/* Step 3: find the X server */
 
+	/* 
+	 * set the X server sigchld to SIG_IGN, that's the
+         * magic to make X send the parent the signal.
+	 */
+	signal(SIGUSR1, SIG_IGN);
+
 	if (!xserver && !access("/usr/bin/Xorg", X_OK))
 		xserver = "/usr/bin/Xorg";
 	if (!xserver && !access("/usr/bin/X", X_OK))
