@@ -47,14 +47,19 @@ void find_tty(void)
 
 	log_string("Entering find_tty");
 
+	/*
+	 * In a later version we need to be able to get the
+	 * terminal to start on from a command line parameter
+	 */
+
 	fd = open("/dev/console", O_RDWR);
-	if (fd >= 0) {
-		vtnum = ioctl(fd, TIOCLINUX, &tiocl_sub);
-		close(fd);
-	} else {
+	if (fd < 0) {
 		log_string("Unable to open /dev/console, using stdin");
 		fd = 0;
 	}
+	vtnum = ioctl(fd, TIOCLINUX, &tiocl_sub);
+	if (fd != 0)
+		close(fd);
 
 	if (vtnum < 0) {
 		log_string("TIOCL_GETFGCONSOLE failed");
@@ -70,9 +75,6 @@ void find_tty(void)
 	log_string(msg);
 	snprintf(msg, 255, "vtnum = %d", vtnum);
 	log_string(msg);
-
-	if (fd)
-		close(fd);
 }
 
 void setup_xauth(void)
