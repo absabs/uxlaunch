@@ -40,7 +40,6 @@ char displayname[256] = ":0";	/* ":0" */
 int vtnum;	 		/* number part after /dev/tty */
 char xauth_cookie_file[PATH_MAX];
 Xauth x_auth;
-Xauth user_xauth;
 
 static pthread_mutex_t notify_mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t notify_condition = PTHREAD_COND_INITIALIZER;
@@ -162,12 +161,9 @@ void setup_xauth(void)
 	}
 
 	/* write it out to disk */
-	if (XauWriteAuth(fp, &x_auth) != 1) {
+	if (XauWriteAuth(fp, &x_auth) != 1)
 		log_string("unable to write xauth data to disk");
-		fclose(fp);
-		close(fd);
-		return;
-	}
+
 	fclose(fp);
 }
 
