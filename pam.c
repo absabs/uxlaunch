@@ -47,21 +47,21 @@ void setup_pam_session(void)
 
 	err = pam_set_item(ph, PAM_TTY, &x);
 	if (err != PAM_SUCCESS) {
-		snprintf(msg, 255, "pam_set_item PAM_TTY returned %d: %s\n", err, pam_strerror(ph, err));
+		snprintf(msg, 256, "pam_set_item PAM_TTY returned %d: %s\n", err, pam_strerror(ph, err));
 		log_string(msg);
 		exit(EXIT_FAILURE);
 	}
 
 	err = pam_set_item(ph, PAM_XDISPLAY, &displayname);
 	if (err != PAM_SUCCESS) {
-		snprintf(msg, 255, "pam_set_item PAM_DISPLAY returned %d: %s\n", err, pam_strerror(ph, err));
+		snprintf(msg, 256, "pam_set_item PAM_DISPLAY returned %d: %s\n", err, pam_strerror(ph, err));
 		log_string(msg);
 		exit(EXIT_FAILURE);
 	}
 
 	err = pam_open_session(ph, 0);
 	if (err != PAM_SUCCESS) {
-		snprintf(msg, 255, "pam_open_session returned %d: %s\n", err, pam_strerror(ph, err));
+		snprintf(msg, 256, "pam_open_session returned %d: %s\n", err, pam_strerror(ph, err));
 		log_string(msg);
 		exit(EXIT_FAILURE);
 	}
@@ -76,7 +76,7 @@ void close_pam_session(void)
 
 	err = pam_close_session(ph, 0);
 	if (err) {
-		snprintf(msg, 255, "pam_close_session returned %d: %s\n", err, pam_strerror(ph, err));
+		snprintf(msg, 256, "pam_close_session returned %d: %s\n", err, pam_strerror(ph, err));
 		log_string(msg);
 	}
 	pam_end(ph, err);
