@@ -270,9 +270,9 @@ void set_text_mode(void)
 
 	log_string("Setting console mode to KD_TEXT");
 
-	fd = open("/dev/console", O_RDWR);
+	fd = open(displaydev, O_RDWR);
 	if (fd < 0) {
-		log_string("Unable to open /dev/console, using stdin");
+		log_string("Unable to open tty to set text mode, using stdin");
 		fd = 0;
 	}
 	ioctl(fd, KDSETMODE, KD_TEXT);
