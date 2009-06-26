@@ -73,6 +73,7 @@ void find_user(int argc, char **argv)
 			if (c) c++;
 			if (c && *c && strstr(line, "user ="))
 				user = strdup(c);
+			// todo: strip \n
 		}
 	}
 
@@ -90,6 +91,8 @@ void find_user(int argc, char **argv)
 			if (entry->d_type != DT_DIR)
 				continue;
 			user = strdup(entry->d_name);
+			// todo: make sure it is valid user id and skip if not
+			// and make sure this is actually the guys homedir
 			break;	
 		}
 		if (dir)
