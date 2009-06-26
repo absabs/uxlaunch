@@ -74,6 +74,7 @@ void log_string(char *string)
 
 	if (log) {
 		fputs(msg, log);
+		fflush(log);
 	} else {
 		logfile_enabled = 0;
 		log_string("Unable to write logfile");
