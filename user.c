@@ -69,7 +69,7 @@ void find_user(int argc, char **argv)
 			if (fgets(line, 1023, file) == NULL)
 				memset(line, 0, 1024);
 			fclose(file);
-			c = strchr(line, '\');
+			c = strchr(line, '\n');
 			if (c) *c = 0;
 			c = strchr(line, '=');
 			if (c) c++;
