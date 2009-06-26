@@ -166,7 +166,6 @@ void setup_xauth(void)
 		log_string("unable to write xauth data to disk");
 
 	fclose(fp);
-	close(fd); // todo: doesn't fclose do this already
 }
 
 static void usr1handler(int foo)
