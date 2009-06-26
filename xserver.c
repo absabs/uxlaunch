@@ -105,7 +105,7 @@ void setup_xauth(void)
 	static char xau_number[] = "0"; // FIXME, detect correct displaynum
 	static char xau_name[] = "MIT-MAGIC-COOKIE-1";
 
-	log_string("** Entering setup_xauth");
+	log_string("Entering setup_xauth");
 
 	fp = fopen("/dev/urandom", "r");
 	if (!fp)
