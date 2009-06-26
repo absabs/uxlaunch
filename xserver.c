@@ -160,12 +160,9 @@ void setup_xauth(void)
 	}
 
 	/* write it out to disk */
-	if (XauWriteAuth(fp, &x_auth) != 1) {
+	if (XauWriteAuth(fp, &x_auth) != 1)
 		log_string("unable to write xauth data to disk");
-		fclose(fp);
-		close(fd);
-		return;
-	}
+
 	fclose(fp);
 	close(fd);
 }
