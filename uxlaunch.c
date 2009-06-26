@@ -82,6 +82,7 @@ int main(int argc, char **argv)
 
 	wait_for_X_exit();
 
+	set_text_mode();
 
 	// close_consolekit_session();
 	stop_dbus_session_bus();

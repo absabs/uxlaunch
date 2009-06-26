@@ -24,6 +24,7 @@
 #include <pthread.h>
 #include <string.h>
 #include <linux/tiocl.h>
+#include <linux/kd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/utsname.h>
@@ -264,4 +265,21 @@ void wait_for_X_exit(void)
 			break;
 	}
 	log_string("X exited");
+}
+
+void set_text_mode(void)
+{
+	int fd;
+
+	log_string("Setting console mode to KD_TEXT");
+
+	fd = open("/dev/console", O_RDWR);
+	if (fd < 0) {
+		log_string("Unable to open /dev/console, using stdin");
+		fd = 0;
+	}
+	ioctl(fd, KDSETMODE, KD_TEXT);
+	if (fd != 0)
+		close(fd);
+
 }

@@ -34,6 +34,7 @@ extern void start_metacity(void);
 extern void autostart_desktop_files(void);
 extern void start_bash(void);
 extern void wait_for_X_exit(void);
+extern void set_text_mode(void);
 
 extern void open_log(void);
 extern void log_string(char *string);
