@@ -40,6 +40,7 @@ char displayname[256] = ":0";	/* ":0" */
 int vtnum;	 		/* number part after /dev/tty */
 char xauth_cookie_file[PATH_MAX];
 Xauth x_auth;
+Xauth user_xauth;
 
 static pthread_mutex_t notify_mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t notify_condition = PTHREAD_COND_INITIALIZER;
@@ -159,9 +160,12 @@ void setup_xauth(void)
 	}
 
 	/* write it out to disk */
-	if (XauWriteAuth(fp, &x_auth) != 1)
+	if (XauWriteAuth(fp, &x_auth) != 1) {
 		log_string("unable to write xauth data to disk");
-
+		fclose(fp);
+		close(fd);
+		return;
+	}
 	fclose(fp);
 	close(fd);
 }
@@ -270,9 +274,9 @@ void set_text_mode(void)
 
 	log_string("Setting console mode to KD_TEXT");
 
-	fd = open(displaydev, O_RDWR);
+	fd = open("/dev/console", O_RDWR);
 	if (fd < 0) {
-		log_string("Unable to open tty to set text mode, using stdin");
+		log_string("Unable to open /dev/console, using stdin");
 		fd = 0;
 	}
 	ioctl(fd, KDSETMODE, KD_TEXT);
