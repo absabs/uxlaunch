@@ -118,10 +118,10 @@ void find_user(int argc, char **argv)
  */
 void switch_to_user(void)
 {
-	char buf[80];
+	char buf[PATH_MAX];
 	int result;
 	FILE *fp;
-	char fn[256];
+	char fn[PATH_MAX];
 
 	log_string("Entering switch_to_user");
 
@@ -139,10 +139,10 @@ void switch_to_user(void)
 	setenv("LOGNAME", pass->pw_name, 1);
 	setenv("HOME", pass->pw_dir, 1);
 	setenv("SHELL", pass->pw_shell, 1);
-	snprintf(buf, 80, "/var/spool/mail/%s", pass->pw_name);
+	snprintf(buf, PATH_MAX, "/var/spool/mail/%s", pass->pw_name);
 	setenv("MAIL", buf, 1);
 	setenv("DISPLAY", displayname, 1);
-	snprintf(buf, 80, "/usr/local/bin:/bin:/usr/bin:%s/bin", pass->pw_dir);
+	snprintf(buf, PATH_MAX, "/usr/local/bin:/bin:/usr/bin:%s/bin", pass->pw_dir);
 	setenv("PATH", buf, 1);
 	snprintf(user_xauth_path, PATH_MAX, "%s/.Xauthority", pass->pw_dir);
 	setenv("XAUTHORITY", user_xauth_path, 1);
@@ -158,7 +158,7 @@ void switch_to_user(void)
 	}
 
 	/* redirect further IO to .xsession-errors */
-	snprintf(fn, 255, "%s/.xsession-errors", pass->pw_dir);
+	snprintf(fn, PATH_MAX, "%s/.xsession-errors", pass->pw_dir);
 	fp = fopen(fn, "w");
 	if (fp) {
 		fclose(fp);

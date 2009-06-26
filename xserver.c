@@ -24,6 +24,7 @@
 #include <pthread.h>
 #include <string.h>
 #include <linux/tiocl.h>
+#include <linux/limits.h>
 #include <linux/kd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -34,10 +35,10 @@
 
 #include <X11/Xauth.h>
 
-char displaydev[256];		/* "/dev/tty1" */
+char displaydev[PATH_MAX];	/* "/dev/tty1" */
 char displayname[256] = ":0";	/* ":0" */
 int vtnum;	 		/* number part after /dev/tty */
-char xauth_cookie_file[256];
+char xauth_cookie_file[PATH_MAX];
 Xauth x_auth;
 Xauth user_xauth;
 
@@ -84,11 +85,11 @@ void find_tty(void)
 	/* kernel starts counting at 0 */
 	vtnum++;
 
-	snprintf(displaydev, 255, "/dev/tty%d", vtnum);
+	snprintf(displaydev, PATH_MAX, "/dev/tty%d", vtnum);
 
-	snprintf(msg, 255, "tty = %s", displaydev);
+	snprintf(msg, 256, "tty = %s", displaydev);
 	log_string(msg);
-	snprintf(msg, 255, "vtnum = %d", vtnum);
+	snprintf(msg, 256, "vtnum = %d", vtnum);
 	log_string(msg);
 }
 
@@ -141,7 +142,7 @@ void setup_xauth(void)
 
 
 	mkdir(XAUTH_DIR, 01755);
-	snprintf(xauth_cookie_file, 80, "%s/Xauth-%s-XXXXXX", XAUTH_DIR, pass->pw_name);
+	snprintf(xauth_cookie_file, PATH_MAX, "%s/Xauth-%s-XXXXXX", XAUTH_DIR, pass->pw_name);
 
 	fd = mkstemp(xauth_cookie_file);
 	if (fd <= 0) {
