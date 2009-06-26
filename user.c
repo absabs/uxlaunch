@@ -69,6 +69,8 @@ void find_user(int argc, char **argv)
 			if (fgets(line, 1023, file) == NULL)
 				memset(line, 0, 1024);
 			fclose(file);
+			c = strchr(line, '\n');
+			if (c) *c = 0;
 			c = strchr(line, '=');
 			if (c) c++;
 			if (c && *c && strstr(line, "user ="))
@@ -90,6 +92,8 @@ void find_user(int argc, char **argv)
 			if (entry->d_type != DT_DIR)
 				continue;
 			user = strdup(entry->d_name);
+			// todo: make sure it is valid user id and skip if not
+			// and make sure this is actually the guys homedir
 			break;	
 		}
 		if (dir)

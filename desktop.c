@@ -152,6 +152,7 @@ void start_metacity(void)
 		return; /* parent continues */
 
 	ret = execl("/usr/bin/metacity", "/usr/bin/metacity", NULL);
+	// todo: make this command line override-able
 	if (ret != EXIT_SUCCESS) 
 		log_string("Failure to start metacity");
 }

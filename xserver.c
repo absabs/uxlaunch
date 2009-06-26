@@ -91,13 +91,15 @@ void find_tty(void)
 	log_string(msg);
 	snprintf(msg, 256, "vtnum = %d", vtnum);
 	log_string(msg);
+
+	// todo: allow command line override
 }
 
 void setup_xauth(void)
 {
 	FILE *fp;
 	int fd;
-	char cookie[16];
+	static char cookie[16];
 	char msg[80];
 	unsigned int i;
 	struct utsname uts;
@@ -167,7 +169,6 @@ void setup_xauth(void)
 		return;
 	}
 	fclose(fp);
-	close(fd);
 }
 
 static void usr1handler(int foo)
@@ -247,7 +248,7 @@ void wait_for_X_signal(void)
 	struct timespec tv;
 	log_string("Entering wait_for_X_signal");
 	clock_gettime(CLOCK_REALTIME, &tv);
-	tv.tv_sec += 2;
+	tv.tv_sec += 10;
 
 	pthread_mutex_lock(&notify_mutex);
 	pthread_cond_timedwait(&notify_condition, &notify_mutex, &tv);
@@ -274,7 +275,8 @@ void set_text_mode(void)
 
 	log_string("Setting console mode to KD_TEXT");
 
-	fd = open("/dev/console", O_RDWR);
+	fd = open(displaydev, O_RDWR);
+
 	if (fd < 0) {
 		log_string("Unable to open /dev/console, using stdin");
 		fd = 0;
