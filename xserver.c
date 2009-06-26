@@ -272,8 +272,8 @@ void set_text_mode(void)
 
 	log_string("Setting console mode to KD_TEXT");
 
-	fd = open("/dev/console", O_RDWR);
-	// todo: use /dev/ttyX 
+	fd = open(displaydev, O_RDWR);
+
 	if (fd < 0) {
 		log_string("Unable to open /dev/console, using stdin");
 		fd = 0;
