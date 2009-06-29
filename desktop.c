@@ -174,7 +174,7 @@ void start_metacity(void)
 	if (ret)
 		return; /* parent continues */
 
-	ret = execl("/usr/bin/metacity", "/usr/bin/metacity", NULL);
+	ret = execl("/usr/bin/metacity", "/usr/bin/metacity", "--sm-disable", NULL);
 	// todo: make this command line override-able
 	if (ret != EXIT_SUCCESS) 
 		log_string("Failure to start metacity");
