@@ -50,7 +50,7 @@ static void do_desktop_file(const char *filename)
 	char line[4096];
 	char exec[4096];
 	int show = 1;
-	static int counter = 0;
+	static int counter = 5;
 
 	file = fopen(filename, "r");
 	if (!file)
@@ -86,6 +86,7 @@ static void do_desktop_file(const char *filename)
 		int count = 0;
 		snprintf(msg, 4096, "Starting -%s-", exec);
 		log_string(msg);
+		counter ++;
 
 		if (!fork()) {
 			int ret;
@@ -99,7 +100,6 @@ static void do_desktop_file(const char *filename)
 				ptrs[++count] = strtok(NULL, " \t");
 			}
 
-			counter ++;
 			usleep(50000 * counter);
 			execvp(ptrs[0], ptrs);
 			exit(ret);
@@ -139,6 +139,29 @@ void autostart_desktop_files(void)
 		do_desktop_file(filename);
 	}
 	closedir(dir);
+}
+
+static void start_panel(char *command)
+{
+	static int counter = - 1;
+
+	counter++;
+	if (fork())
+		return; /* parent */
+
+	usleep(counter * 50000);
+	execl(command, command, NULL);
+}
+
+void start_panels(void)
+{
+	start_panel("/usr/libexec/moblin-panel-myzone");
+	start_panel("/usr/libexec/moblin-panel-status");
+	start_panel("/usr/libexec/moblin-panel-people");
+	start_panel("/usr/libexec/moblin-panel-internet");
+	start_panel("/usr/libexec/moblin-panel-media");
+	start_panel("/usr/libexec/moblin-panel-pasteboard");
+	start_panel("/usr/libexec/moblin-panel-applications");
 }
 
 void start_metacity(void)

@@ -78,6 +78,8 @@ int main(int argc, char **argv)
 
 	start_metacity();
 
+	start_panels();
+
 	autostart_desktop_files();
 
 	wait_for_X_exit();
