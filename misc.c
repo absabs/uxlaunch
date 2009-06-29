@@ -16,12 +16,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
 
 #include "uxlaunch.h"
 
+static int ssh_agent_pid;
+
 /*
- * ssh-agent prints a bunch of env variables to its stdout that we need to put in 
- * the environment. 
+ * ssh-agent prints a bunch of env variables to its stdout that we need to put in
+ * the environment.
  */
 void start_ssh_agent(void)
 {
@@ -40,8 +43,8 @@ void start_ssh_agent(void)
 	 * ssh-agent output looks like this:
 	 *
 	 * SSH_AUTH_SOCK=/tmp/ssh-ccZMs16230/agent.16230; export SSH_AUTH_SOCK;
- 	 * SSH_AGENT_PID=16231; export SSH_AGENT_PID;
- 	 * echo Agent pid 16231;
+	 * SSH_AGENT_PID=16231; export SSH_AGENT_PID;
+	 * echo Agent pid 16231;
 	 * 
 	 * so search for "; export", cut that off. Then split at the = for env var name
 	 * and value.
@@ -59,11 +62,19 @@ void start_ssh_agent(void)
 				*c2 = 0;
 				c2++;
 				setenv(line, c2, 1);
+				/* store PID for later */
+				if (!strcmp(line, "SSH_AGENT_PID"))
+					ssh_agent_pid = atoi(c2);
 			}
 		}
 	}
 	pclose(file);
 	log_environment();
+}
+
+void stop_ssh_agent(void)
+{
+	kill(ssh_agent_pid, SIGTERM);
 }
 
 /*

@@ -87,11 +87,12 @@ int main(int argc, char **argv)
 	set_text_mode();
 
 	// close_consolekit_session();
+	stop_ssh_agent();
 	stop_dbus_session_bus();
 	close_pam_session();
 
 	/* Make sure that we clean up after ourselves */
 	kill(0, SIGTERM);
 
-	return EXIT_SUCCESS; 
+	return EXIT_SUCCESS;
 }

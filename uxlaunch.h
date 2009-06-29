@@ -28,6 +28,7 @@ extern void start_dbus_session_bus(void);
 extern void stop_dbus_session_bus(void);
 extern void setup_consolekit_session(void);
 extern void start_ssh_agent(void);
+extern void stop_ssh_agent(void);
 extern void start_gconf(void);
 extern void maybe_start_screensaver(void);
 extern void start_metacity(void);
