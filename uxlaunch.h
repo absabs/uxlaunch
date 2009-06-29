@@ -31,6 +31,7 @@ extern void start_ssh_agent(void);
 extern void start_gconf(void);
 extern void maybe_start_screensaver(void);
 extern void start_metacity(void);
+extern void start_panels(void);
 extern void autostart_desktop_files(void);
 extern void start_bash(void);
 extern void wait_for_X_exit(void);
