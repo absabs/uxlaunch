@@ -99,10 +99,14 @@ void start_bash(void)
 void start_gconf(void)
 {
 	int ret;
+
 	log_string("Entering start_gconf");
 	ret = system("gconftool-2 --spawn");
-	if (!ret)
-		log_string("failure to start gconftool-2");
+	if (ret) {
+		char msg[80];
+		snprintf(msg, 80, "failure to start gconftool-2: %d", ret);
+		log_string(msg);
+	}
 }
 
 
