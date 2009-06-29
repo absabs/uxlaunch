@@ -117,6 +117,7 @@ void autostart_desktop_files(void)
 	struct dirent *entry;
 
 	log_string("Entering autostart_desktop_files");
+	sleep(1);
 
 	dir = opendir("/etc/xdg/autostart");
 	if (!dir) {
