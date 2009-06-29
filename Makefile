@@ -2,7 +2,7 @@ all: uxlaunch
 
 install: uxlaunch
 	mkdir -p $(DESTDIR)/usr/sbin
-	install -m0755 -o root -g root uxlaunch $(DESTDIR)/usr/sbin/
+	install uxlaunch $(DESTDIR)/usr/sbin/
 
 OBJS := uxlaunch.o consolekit.o dbus.o desktop.o misc.o pam.o user.o xserver.o lib.o
 
