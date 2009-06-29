@@ -50,7 +50,7 @@ int main(int argc, char **argv)
 
 
 	find_user(argc, argv);
-	find_tty();
+	find_tty(argc, argv);
 
 	setup_pam_session();
 

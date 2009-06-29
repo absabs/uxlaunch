@@ -20,7 +20,7 @@ extern void find_user(int argc, char **argv);
 extern void setup_pam_session(void);
 extern void close_pam_session(void);
 extern void switch_to_user(void);
-extern void find_tty(void);
+extern void find_tty(int argc, char **argv);
 extern void setup_xauth(void);
 extern void start_X_server(void);
 extern void wait_for_X_signal(void);
