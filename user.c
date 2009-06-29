@@ -82,6 +82,8 @@ void find_user(int argc, char **argv)
 	if (!user) {
 		dir = opendir("/home");
 		while (dir) {
+			char buf[80];
+
 			entry = readdir(dir);
 			if (!entry)
 				break;
@@ -91,10 +93,16 @@ void find_user(int argc, char **argv)
 				continue;
 			if (entry->d_type != DT_DIR)
 				continue;
+
 			user = strdup(entry->d_name);
-			// todo: make sure it is valid user id and skip if not
-			// and make sure this is actually the guys homedir
-			break;	
+			/* check if this is actually a valid user */
+			pass = getpwnam(user);
+			if (!pass)
+				continue;
+			/* and make sure this is actually the guys homedir */
+			snprintf(buf, 80, "/home/%s", user);
+			if (!strcmp(pass->pw_dir, buf))
+				break;
 		}
 		if (dir)
 			closedir(dir);
