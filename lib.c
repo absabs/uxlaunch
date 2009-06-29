@@ -64,7 +64,7 @@ void log_string(char *string)
 	}
 	usecs = current.tv_usec - start.tv_usec;
 
-	snprintf(msg, 8192, "[%02llu.%06llu] %s", secs, usecs, string);
+	snprintf(msg, 8192, "[%02llu.%06llu] [%d] %s", secs, usecs, getpid(), string);
 	if (msg[strlen(msg)] != '\n')
 		strcat(msg, "\n");
 	fprintf(stderr, "%s", msg);
