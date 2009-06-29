@@ -177,6 +177,18 @@ static void usr1handler(int foo)
 	pthread_mutex_unlock(&notify_mutex);
 }
 
+
+static void termhandler(int foo)
+{
+	if (foo++) foo--; /*  shut down warning */
+	/*
+	 * we received either:
+	 * - a TERM from init when switching to init 3
+	 * - an INT from a ^C press in the console when running in fg
+	 */
+	kill(xpid, SIGTERM);
+}
+
 /*
  * start the X server
  * Step 1: arm the signal
@@ -186,7 +198,8 @@ static void usr1handler(int foo)
  */
 void start_X_server(void)
 {
-	struct sigaction act;
+	struct sigaction usr1;
+	struct sigaction term;
 	char *xserver = NULL;
 	int ret;
 	char vt[80];
@@ -194,17 +207,19 @@ void start_X_server(void)
 	log_string("Entering start_X_server");
 
 	/* Step 1: arm the signal */
-
-	memset(&act, 0, sizeof(struct sigaction));
-
-	act.sa_handler = usr1handler;
-	sigaction(SIGUSR1, &act, NULL);
+	memset(&usr1, 0, sizeof(struct sigaction));
+	usr1.sa_handler = usr1handler;
+	sigaction(SIGUSR1, &usr1, NULL);
 
 	/* Step 2: fork */
-
 	ret = fork();
 	if (ret) {
 		xpid = ret;
+		/* setup sighandler for main thread */
+		memset(&term, 0, sizeof(struct sigaction));
+		term.sa_handler = termhandler;
+		sigaction(SIGTERM, &term, NULL);
+		sigaction(SIGINT, &term, NULL);
 		return; /* we're the main thread */
 	}
 
@@ -212,7 +227,7 @@ void start_X_server(void)
 
 	/* Step 3: find the X server */
 
-	/* 
+	/*
 	 * set the X server sigchld to SIG_IGN, that's the
          * magic to make X send the parent the signal.
 	 */
@@ -252,7 +267,7 @@ void wait_for_X_signal(void)
 	log_string("done");
 
 }
- 
+
 void wait_for_X_exit(void)
 {	
 	int ret;
