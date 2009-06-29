@@ -178,9 +178,13 @@ static void usr1handler(int foo)
 }
 
 
+static volatile int exiting = 0;
+
 static void termhandler(int foo)
 {
 	if (foo++) foo--; /*  shut down warning */
+
+	exiting = 1;
 	/*
 	 * we received either:
 	 * - a TERM from init when switching to init 3
@@ -272,7 +276,7 @@ void wait_for_X_exit(void)
 {	
 	int ret;
 	log_string("wait_for_X_exit");
-	while (1) {
+	while (!exiting) {
 		ret = waitpid(0, NULL, 0);
 		if (ret == xpid)
 			break;
