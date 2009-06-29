@@ -67,7 +67,7 @@ void log_string(char *string)
 	snprintf(msg, 8192, "[%02llu.%06llu] [%d] %s", secs, usecs, getpid(), string);
 	if (msg[strlen(msg)] != '\n')
 		strcat(msg, "\n");
-	fprintf(stderr, "%s", msg);
+//	fprintf(stderr, "%s", msg);
 
 	if (!logfile_enabled)
 		return;
