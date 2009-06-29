@@ -100,7 +100,7 @@ static void do_desktop_file(const char *filename)
 				ptrs[++count] = strtok(NULL, " \t");
 			}
 
-			usleep(50000 * counter);
+			usleep(200000 * counter);
 			execvp(ptrs[0], ptrs);
 			exit(ret);
 		}
