@@ -39,6 +39,7 @@ static CkConnector *connector = NULL;
  */
 void setup_consolekit_session(void)
 {
+	char msg[256];
 	DBusError error;
 	char *d = &displaydev[0];
 	char *n = &displayname[0];
@@ -62,8 +63,9 @@ void setup_consolekit_session(void)
 						       "x11-display-device", &d,
 						       "x11-display", &n,
 						       NULL)) {
-		printf("Error: Unable to open session with ConsoleKit: %s: %s\n",
+		snprintf(msg, 256, "Error: Unable to open session with ConsoleKit: %s: %s\n",
 			error.name, error.message);
+		log_string(msg);
 		return;
 	}
 
