@@ -1,3 +1,5 @@
+VERSION = "v0.4"
+
 all: uxlaunch
 
 install: uxlaunch
@@ -23,3 +25,8 @@ uxlaunch: $(OBJS) Makefile
 
 clean:
 	rm -rf *.o *~ uxlaunch
+
+dist:
+	git tag $(VERSION)
+	git archive --format=tar -v --prefix="uxlaunch-$(VERSION)/" $(VERSION) | \
+		gzip > uxlaunch-$(VERSION).tar.gz
