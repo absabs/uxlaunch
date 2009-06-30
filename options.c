@@ -28,12 +28,14 @@ int tty = 2;
 char session[256] = "/usr/bin/metacity --sm-disable";
 char username[256] = "moblin";
 
+int verbose = 0;
 
 static struct option opts[] = {
 	{ "user", 1, NULL, 'u' },
 	{ "tty", 1, NULL, 't' },
 	{ "session", 1, NULL, 's' },
 	{ "help", 1, NULL, 'h' },
+	{ "verbose", 0, NULL, 'v' },
 	{ 0, 0, NULL, 0}
 };
 
@@ -44,6 +46,7 @@ void usage(const char *name)
 	printf("  -u, --user      Start session as specific username\n");
 	printf("  -t, --tty       Start session on alternative tty number\n");
 	printf("  -s, --session   Start a non-default session\n");
+	printf("  -v, --verbose   Display lots of output to the console\n");
 	printf("  -h, --help      Display this help message\n");
 }
 
@@ -120,7 +123,7 @@ void get_options(int argc, char **argv)
 
 	/* parse cmdline - overrides */
 	while (1) {
-		c = getopt_long(argc, argv, "u:t:s:h", opts, &i);
+		c = getopt_long(argc, argv, "u:t:s:hv", opts, &i);
 		if (c == -1)
 			break;
 
@@ -137,6 +140,9 @@ void get_options(int argc, char **argv)
 		case 'h':
 			usage(argv[0]);
 			exit (EXIT_SUCCESS);
+			break;
+		case 'v':
+			verbose = 1;
 			break;
 		default:
 			break;

@@ -18,6 +18,8 @@ extern int tty;
 extern char session[];
 extern char username[];
 
+extern int verbose;
+
 extern void get_options(int argc, char **argv);
 extern void setup_pam_session(void);
 extern void close_pam_session(void);
