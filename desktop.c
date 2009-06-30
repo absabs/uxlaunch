@@ -134,7 +134,7 @@ void autostart_desktop_files(void)
 			continue;
 		if (entry->d_type != DT_REG)
 			continue;
-		if (strchr(entry->d_name, '~')) 
+		if (strchr(entry->d_name, '~'))
 			continue;  /* editor backup file */
 		snprintf(filename, 4096, "/etc/xdg/autostart/%s", entry->d_name);
 		do_desktop_file(filename);
@@ -165,18 +165,26 @@ void start_panels(void)
 	start_panel("/usr/libexec/moblin-panel-applications");
 }
 
-void start_metacity(void)
+void start_desktop_session(void)
 {
 	int ret;
-	log_string("Entering start_metacity");
+	int count = 0;
+	char *ptrs[256];
+	log_string("Entering start_desktop_session");
 
 	ret = fork();
 
 	if (ret)
 		return; /* parent continues */
 
-	ret = execl("/usr/bin/metacity", "/usr/bin/metacity", "--sm-disable", NULL);
-	// todo: make this command line override-able
-	if (ret != EXIT_SUCCESS) 
+	memset(ptrs, 0, sizeof(ptrs));
+
+	ptrs[0] = strtok(session, " \t");
+	while (ptrs[count] && count < 255)
+		ptrs[++count] = strtok(NULL, " \t");
+	
+	ret = execv(ptrs[0], ptrs);
+
+	if (ret != EXIT_SUCCESS)
 		log_string("Failure to start metacity");
 }

@@ -39,7 +39,7 @@ int main(int argc, char **argv)
 	 *
 	 * We then wait for X to signal that it's ready
 	 * to draw stuff.
-	 * 
+	 *
 	 * Once X is running, we set up the ConsoleKit session,
 	 * check if the screensaver needs to lock the screen
 	 * and then start the window manager.
@@ -48,9 +48,8 @@ int main(int argc, char **argv)
 	 * ... and we're done.
 	 */
 
-
-	find_user(argc, argv);
-	find_tty(argc, argv);
+	get_options(argc, argv);
+	set_tty();
 
 	setup_pam_session();
 
@@ -76,7 +75,7 @@ int main(int argc, char **argv)
 
 	maybe_start_screensaver();
 
-	start_metacity();
+	start_desktop_session();
 
 	start_panels();
 

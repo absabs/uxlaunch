@@ -4,7 +4,8 @@ install: uxlaunch
 	mkdir -p $(DESTDIR)/usr/sbin
 	install uxlaunch $(DESTDIR)/usr/sbin/
 
-OBJS := uxlaunch.o consolekit.o dbus.o desktop.o misc.o pam.o user.o xserver.o lib.o
+OBJS := uxlaunch.o consolekit.o dbus.o desktop.o misc.o pam.o user.o xserver.o \
+	lib.o options.o
 
 CFLAGS += -Wall -W -Os -g -fstack-protector -D_FORTIFY_SOURCE=2 -Wformat -fno-common \
 	 -Wimplicit-function-declaration  -Wimplicit-int \

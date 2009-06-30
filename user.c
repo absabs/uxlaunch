@@ -26,100 +26,11 @@
 
 #include <X11/Xauth.h>
 
-char *user;
 int uid;
 struct passwd *pass;
 
 static char user_xauth_path[PATH_MAX];
 
-
-/*
- * This function needs to find the user name and UID/GID of the user
- * we want to be logged in as.
- * Stragegy:
- * Pick the first one from
- * 1) passed as --user <name> on the command line
- * 2) from /etc/sysconfig/uxlaunch
- * 3) first user in /home
- * 4) "moblin"
- */
-
-void find_user(int argc, char **argv)
-{
-	DIR *dir;
-	struct dirent *entry;
-	int i;
-	log_string("Entering find_user");
-
-	/* pass 1: find --user on the command line */
-	for (i = 0; i < argc -1 ; i++) {
-		if (!user && strcmp(argv[i], "--user") == 0) {
-			user = strdup(argv[i+1]);
-		}
-	}
-
-	/* pass 2: look in the /etc/sysconfig/uxlaunch file */
-	if (!user) {
-		FILE *file;
-		char line[1024];
-		file = fopen("/etc/sysconfig/uxlaunch", "r");
-		if (file) {
-			char *c;
-			memset(line, 0, 1024);
-			if (fgets(line, 1023, file) == NULL)
-				memset(line, 0, 1024);
-			fclose(file);
-			c = strchr(line, '\n');
-			if (c) *c = 0;
-			c = strchr(line, '=');
-			if (c) c++;
-			if (c && *c && strstr(line, "user ="))
-				user = strdup(c);
-		}
-	}
-
-	/* pass 3: first user in /home */
-	if (!user) {
-		dir = opendir("/home");
-		while (dir) {
-			char buf[80];
-
-			entry = readdir(dir);
-			if (!entry)
-				break;
-			if (entry->d_name[0] == '.')
-				continue;
-			if (strcmp(entry->d_name, "lost+found")==0)
-				continue;
-			if (entry->d_type != DT_DIR)
-				continue;
-
-			user = strdup(entry->d_name);
-			/* check if this is actually a valid user */
-			pass = getpwnam(user);
-			if (!pass)
-				continue;
-			/* and make sure this is actually the guys homedir */
-			snprintf(buf, 80, "/home/%s", user);
-			if (!strcmp(pass->pw_dir, buf))
-				break;
-		}
-		if (dir)
-			closedir(dir);
-	}
-
-	/* pass 4: "moblin" */
-	if (!user)
-		user = strdup("moblin");
-
-	log_string("user found is:");
-	log_string(user);
-
-	/* translate user name to uid */
-	pass = getpwnam(user);
-	if (pass)
-		uid = pass->pw_uid;
-}
 
 /*
  * Change from root (as we started) to the target user.

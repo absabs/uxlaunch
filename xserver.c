@@ -55,35 +55,23 @@ static int xpid;
  * TIOCLINUX will tell us which console is currently showing
  * for this purpose.
  */
-void find_tty(int argc, char **argv)
+void set_tty(void)
 {
 	int fd;
-	int tty;
-	int i;
 	char msg[256];
 	unsigned char tiocl_sub = TIOCL_GETFGCONSOLE;
 
-	log_string("Entering find_tty");
+	log_string("Entering set_tty");
 
-	/* find --tty on the command line */
-	for (i = 0; i < argc -1 ; i++) {
-		if (!user && strcmp(argv[i], "--tty") != 0)
-			continue;
-
-		tty = atoi(argv[i+1]);
-
-		/* switch to this console */
-		fd = open("/dev/console", O_RDWR);
-		if (fd < 0) {
-			log_string("Unable to open /dev/console, using stdin");
-			fd = 0;
-		}
-		ioctl(fd, VT_ACTIVATE, tty);
-		if (fd != 0)
-			close(fd);
-
-		/* let the code below redo discovery of tty */
+	/* switch to this console */
+	fd = open("/dev/console", O_RDWR);
+	if (fd < 0) {
+		log_string("Unable to open /dev/console, using stdin");
+		fd = 0;
 	}
+	ioctl(fd, VT_ACTIVATE, tty);
+	if (fd != 0)
+		close(fd);
 
 	/*
 	 * In a later version we need to be able to get the

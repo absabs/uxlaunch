@@ -58,7 +58,7 @@ void setup_consolekit_session(void)
 	 * to pass in a address that contains a pointer to the string.
 	 */
 	if (!ck_connector_open_session_with_parameters(connector, &error,
-						       "unix-user", &uid,
+						       "unix-user", &pass->pw_uid,
 						       "display-device", &d,
 						       "x11-display-device", &d,
 						       "x11-display", &n,
