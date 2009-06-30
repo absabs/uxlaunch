@@ -209,7 +209,7 @@ static void termhandler(int foo)
 	 * - a TERM from init when switching to init 3
 	 * - an INT from a ^C press in the console when running in fg
 	 */
-	kill(xpid, SIGTERM);
+	kill(xpid, SIGKILL);
 }
 
 /*
