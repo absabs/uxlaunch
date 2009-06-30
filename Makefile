@@ -1,4 +1,4 @@
-VERSION = "v0.4"
+VERSION = "0.4"
 
 all: uxlaunch
 
@@ -27,6 +27,6 @@ clean:
 	rm -rf *.o *~ uxlaunch
 
 dist:
-	git tag $(VERSION)
+	git tag "v$(VERSION)"
 	git archive --format=tar -v --prefix="uxlaunch-$(VERSION)/" $(VERSION) | \
 		gzip > uxlaunch-$(VERSION).tar.gz
