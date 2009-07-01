@@ -14,6 +14,7 @@
 
 #include <unistd.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <sys/time.h>
@@ -43,10 +44,13 @@ void open_log(void)
 		logfile_enabled = 0;
 }
 
-void log_string(char *string)
+
+void lprintf(const char* fmt, ...)
 {
+	va_list args;
 	struct timeval current;
 	uint64_t secs, usecs;
+	char string[8192];
 	char msg[8192];
 
 	if (first_time) {
@@ -64,21 +68,27 @@ void log_string(char *string)
 	}
 	usecs = current.tv_usec - start.tv_usec;
 
-	snprintf(msg, 8192, "[%02llu.%06llu] [%d] %s", secs, usecs, getpid(), string);
-	if (msg[strlen(msg)] != '\n')
-		strcat(msg, "\n");
+	va_start(args, fmt);
+	vsnprintf(msg, 8192, fmt, args);
+	va_end(args);
+
+	if (msg[strlen(msg) - 1] == '\n')
+		msg[strlen(msg) - 1] = '\0';
+
+	snprintf(string, 8192, "[%02llu.%06llu] [%d] %s\n", secs, usecs, getpid(), msg);
+
 	if (verbose)
-		fprintf(stderr, "%s", msg);
+		fprintf(stderr, "%s", string);
 
 	if (!logfile_enabled)
 		return;
 
 	if (log) {
-		fputs(msg, log);
+		fputs(string, log);
 		fflush(log);
 	} else {
 		logfile_enabled = 0;
-		log_string("Unable to write logfile");
+		lprintf("Unable to write logfile, file logging disabled");
 	}
 }
 
@@ -89,12 +99,12 @@ void log_environment(void)
 
 	env = environ;
 	
-	log_string("Dumping environment");
-	log_string("----------------------------------");
+	lprintf("Dumping environment");
+	lprintf("----------------------------------");
 	while (*env) {
-		log_string(*env);
+		lprintf(*env);
 		env++;
 	}
-	log_string("----------------------------------");
+	lprintf("----------------------------------");
 }
 

@@ -57,7 +57,6 @@ void get_options(int argc, char **argv)
 	FILE *f;
 	DIR *dir;
 	struct dirent *entry;
-	char msg[256];
 
 	/*
 	 * default fallbacks are listed above in the declations
@@ -168,13 +167,9 @@ void get_options(int argc, char **argv)
 		}
 	}
 
-	log_string("options:");
-	snprintf(msg, 256, "username: %s", username);
-	log_string(msg);
-	snprintf(msg, 256, "tty %d", tty);
-	log_string(msg);
-	snprintf(msg, 256, "session: %s", session);
-	log_string(msg);
+	lprintf("username: %s", username);
+	lprintf("tty %d", tty);
+	lprintf("session: %s", session);
 
 	pass = getpwnam(username);
 	if (!pass)

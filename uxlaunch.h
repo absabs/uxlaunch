@@ -42,7 +42,7 @@ extern void wait_for_X_exit(void);
 extern void set_text_mode(void);
 
 extern void open_log(void);
-extern void log_string(char *string);
+extern void lprintf(const char *, ...);
 extern void log_environment(void);
 
 extern void close_log(void);

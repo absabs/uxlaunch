@@ -35,11 +35,10 @@ struct pam_conv pc;
  */
 void setup_pam_session(void)
 {
-	char msg[256];
 	char x[256];
 	int err;
 
-	log_string("Entering setup_pam_session");
+	lprintf("Entering setup_pam_session");
 
 	snprintf(x, 256, "tty%d", tty);
 
@@ -47,37 +46,31 @@ void setup_pam_session(void)
 
 	err = pam_set_item(ph, PAM_TTY, &x);
 	if (err != PAM_SUCCESS) {
-		snprintf(msg, 256, "pam_set_item PAM_TTY returned %d: %s\n", err, pam_strerror(ph, err));
-		log_string(msg);
+		lprintf("pam_set_item PAM_TTY returned %d: %s\n", err, pam_strerror(ph, err));
 		exit(EXIT_FAILURE);
 	}
 
 	err = pam_set_item(ph, PAM_XDISPLAY, &displayname);
 	if (err != PAM_SUCCESS) {
-		snprintf(msg, 256, "pam_set_item PAM_DISPLAY returned %d: %s\n", err, pam_strerror(ph, err));
-		log_string(msg);
+		lprintf("pam_set_item PAM_DISPLAY returned %d: %s\n", err, pam_strerror(ph, err));
 		exit(EXIT_FAILURE);
 	}
 
 	err = pam_open_session(ph, 0);
 	if (err != PAM_SUCCESS) {
-		snprintf(msg, 256, "pam_open_session returned %d: %s\n", err, pam_strerror(ph, err));
-		log_string(msg);
+		lprintf("pam_open_session returned %d: %s\n", err, pam_strerror(ph, err));
 		exit(EXIT_FAILURE);
 	}
 }
 
 void close_pam_session(void)
 {
-	char msg[256];
 	int err;
 
-	log_string("Entering close_pam_session");
+	lprintf("Entering close_pam_session");
 
 	err = pam_close_session(ph, 0);
-	if (err) {
-		snprintf(msg, 256, "pam_close_session returned %d: %s\n", err, pam_strerror(ph, err));
-		log_string(msg);
-	}
+	if (err)
+		lprintf("pam_close_session returned %d: %s\n", err, pam_strerror(ph, err));
 	pam_end(ph, err);
 }

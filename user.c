@@ -46,7 +46,7 @@ void switch_to_user(void)
 	FILE *fp;
 	char fn[PATH_MAX];
 
-	log_string("Entering switch_to_user");
+	lprintf("Entering switch_to_user");
 
 	initgroups(pass->pw_name, pass->pw_gid);
 
@@ -74,9 +74,8 @@ void switch_to_user(void)
 
 	fp = fopen(user_xauth_path, "w");
 	if (fp) {
-		if (XauWriteAuth(fp, &x_auth) != 1) {
-			log_string("Unable to write .Xauthority");
-		}
+		if (XauWriteAuth(fp, &x_auth) != 1)
+			lprintf("Unable to write .Xauthority");
 		fclose(fp);
 	}
 

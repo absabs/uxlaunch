@@ -30,13 +30,14 @@ void start_ssh_agent(void)
 {
 	FILE *file;
 	char line[4096];
-	log_string("Entering start_ssh_agent");
+
+	lprintf("Entering start_ssh_agent");
 
 	memset(line, 0, 4096);
 
 	file = popen("/usr/bin/ssh-agent", "r");
 	if (!file) {
-		log_string("!! Failed to start ssh-agent");
+		lprintf("Failed to start ssh-agent");
 		return;
 	}
 	/*
@@ -84,12 +85,12 @@ void start_bash(void)
 {
 	int ret;
 
-	log_string("Entering start_bash");
+	lprintf("Entering start_bash");
 
 	fprintf(stderr, "Starting bash shell -- type exit to continue\n");
 	ret = system("/bin/bash");
 	if (ret != EXIT_SUCCESS)
-		log_string("bash returned an error");
+		lprintf("bash returned an error");
 }
 
 /*
@@ -100,13 +101,11 @@ void start_gconf(void)
 {
 	int ret;
 
-	log_string("Entering start_gconf");
+	lprintf("Entering start_gconf");
+
 	ret = system("gconftool-2 --spawn");
-	if (ret) {
-		char msg[80];
-		snprintf(msg, 80, "failure to start gconftool-2: %d", ret);
-		log_string(msg);
-	}
+	if (ret)
+		lprintf("failure to start gconftool-2: %d", ret);
 }
 
 
@@ -121,14 +120,17 @@ void start_gconf(void)
 void maybe_start_screensaver(void)
 {
 	int ret;
-	log_string("Entering maybe_start_screensaver");
+
+	lprintf("Entering maybe_start_screensaver");
+
 	/* the screensaver becomes a daemon */
 	ret = system("/usr/bin/gnome-screensaver"); 
 	if (!ret)
-		log_string("Failed to launch /usr/bin/gnome-screensaver");
+		lprintf("Failed to launch /usr/bin/gnome-screensaver");
+
 	if (!access("/etc/sysconfig/lock-screen", R_OK)) {
 		ret = system("/usr/bin/gnome-screensaver-command --lock");
 		if (!ret)
-			log_string("Failed to launch /usr/bin/gnome-screensaver-command");
+			lprintf("Failed to launch /usr/bin/gnome-screensaver-command");
 	}
 }
