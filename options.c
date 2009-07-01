@@ -25,7 +25,7 @@
 
 /* builtin defaults */
 int tty = 2;
-char session[256] = "/usr/bin/metacity --sm-disable";
+char session[256] = "/usr/bin/mutter --sm-disable";
 char username[256] = "moblin";
 
 int verbose = 0;
