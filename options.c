@@ -107,16 +107,13 @@ void get_options(int argc, char **argv)
 
 			c = strchr(buf, '\n');
 			if (c) *c = 0; /* remove trailing \n */
+
 			key = strtok(buf, "=");
 			if (!key)
 				continue;
 			val = strtok(NULL, "=");
 			if (!val)
 				continue;
-
-			/* chomp() */
-			if (val[strlen(val) - 1] == '\n')
-				val[strlen(val) - 1] = '\0';
 
 			// todo: filter leading/trailing whitespace
 

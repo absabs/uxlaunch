@@ -3,6 +3,7 @@
 
 #include <X11/Xauth.h>
 
+
 /*
  * Target user information
  */

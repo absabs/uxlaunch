@@ -1,4 +1,6 @@
-VERSION = 0.4
+VERSION = 0.7
+
+CC := gcc
 
 all: uxlaunch
 
@@ -19,7 +21,7 @@ LDADD  += `pkg-config --libs dbus-1` \
 	  -lpam -lpthread -lrt -lXau
 
 uxlaunch: $(OBJS) Makefile
-	gcc -o uxlaunch $(OBJS) $(LDADD)
+	$(CC) -o uxlaunch $(OBJS) $(LDADD) $(LDFLAGS)
 
 .SILENT:
 
