@@ -41,7 +41,7 @@ void setup_pam_session(void)
 
 	log_string("Entering setup_pam_session");
 
-	snprintf(x, 256, "tty%d", vtnum);
+	snprintf(x, 256, "tty%d", tty);
 
 	err = pam_start("login", pass->pw_name, &pc, &ph);
 

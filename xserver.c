@@ -23,7 +23,6 @@
 #include <signal.h>
 #include <pthread.h>
 #include <string.h>
-#include <linux/tiocl.h>
 #include <linux/limits.h>
 #include <linux/vt.h>
 #include <linux/kd.h>
@@ -38,7 +37,6 @@
 
 char displaydev[PATH_MAX];	/* "/dev/tty1" */
 char displayname[256] = ":0";	/* ":0" */
-int vtnum;	 		/* number part after /dev/tty */
 char xauth_cookie_file[PATH_MAX];
 Xauth x_auth;
 
@@ -59,7 +57,6 @@ void set_tty(void)
 {
 	int fd;
 	char msg[256];
-	unsigned char tiocl_sub = TIOCL_GETFGCONSOLE;
 
 	log_string("Entering set_tty");
 
@@ -73,31 +70,9 @@ void set_tty(void)
 	if (fd != 0)
 		close(fd);
 
-	/*
-	 * In a later version we need to be able to get the
-	 * terminal to start on from a command line parameter
-	 */
+	snprintf(displaydev, PATH_MAX, "/dev/tty%d", tty);
 
-	fd = open("/dev/console", O_RDWR);
-	if (fd < 0) {
-		log_string("Unable to open /dev/console, using stdin");
-		fd = 0;
-	}
-	vtnum = ioctl(fd, TIOCLINUX, &tiocl_sub);
-	if (fd != 0)
-		close(fd);
-
-	if (vtnum < 0) {
-		log_string("TIOCL_GETFGCONSOLE failed");
-		exit(EXIT_FAILURE);
-	}
-
-	/* kernel starts counting at 0 */
-	vtnum++;
-
-	snprintf(displaydev, PATH_MAX, "/dev/tty%d", vtnum);
-
-	snprintf(msg, 256, "Using %s (vt%d) as display device", displaydev, vtnum);
+	snprintf(msg, 256, "Using %s as display device", displaydev);
 	log_string(msg);
 }
 
@@ -253,7 +228,7 @@ void start_X_server(void)
 		_exit(EXIT_FAILURE);
 	}
 
-	snprintf(vt, 80, "vt%d", vtnum);
+	snprintf(vt, 80, "vt%d", tty);
 
 	/* Step 4: start the X server */
 	execl(xserver, xserver,  displayname, "-nr", "-verbose", "-auth", xauth_cookie_file,

@@ -10,7 +10,6 @@ extern struct passwd *pass;
 
 extern char displaydev[];
 extern char displayname[];
-extern int  vtnum;
 extern char xauth_cookie_file[];
 extern Xauth x_auth;
 
