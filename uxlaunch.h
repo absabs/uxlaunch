@@ -10,7 +10,6 @@ extern struct passwd *pass;
 
 extern char displaydev[];
 extern char displayname[];
-extern int  vtnum;
 extern char xauth_cookie_file[];
 extern Xauth x_auth;
 
@@ -43,7 +42,7 @@ extern void wait_for_X_exit(void);
 extern void set_text_mode(void);
 
 extern void open_log(void);
-extern void log_string(char *string);
+extern void lprintf(const char *, ...);
 extern void log_environment(void);
 
 extern void close_log(void);

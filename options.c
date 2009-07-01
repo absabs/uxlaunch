@@ -31,10 +31,10 @@ char username[256] = "moblin";
 int verbose = 0;
 
 static struct option opts[] = {
-	{ "user", 1, NULL, 'u' },
-	{ "tty", 1, NULL, 't' },
+	{ "user",    1, NULL, 'u' },
+	{ "tty",     1, NULL, 't' },
 	{ "session", 1, NULL, 's' },
-	{ "help", 1, NULL, 'h' },
+	{ "help",    0, NULL, 'h' },
 	{ "verbose", 0, NULL, 'v' },
 	{ 0, 0, NULL, 0}
 };
@@ -57,7 +57,6 @@ void get_options(int argc, char **argv)
 	FILE *f;
 	DIR *dir;
 	struct dirent *entry;
-	char msg[256];
 
 	/*
 	 * default fallbacks are listed above in the declations
@@ -115,7 +114,11 @@ void get_options(int argc, char **argv)
 			if (!val)
 				continue;
 
-			// todo: chomp whitespace that trails or leads
+			/* chomp() */
+			if (val[strlen(val) - 1] == '\n')
+				val[strlen(val) - 1] = '\0';
+
+			// todo: filter leading/trailing whitespace
 
 			if (!strcmp(key, "user"))
 				strncpy(username, val, 256);
@@ -167,13 +170,9 @@ void get_options(int argc, char **argv)
 		}
 	}
 
-	log_string("options:");
-	snprintf(msg, 256, "username: %s", username);
-	log_string(msg);
-	snprintf(msg, 256, "tty %d", tty);
-	log_string(msg);
-	snprintf(msg, 256, "session: %s", session);
-	log_string(msg);
+	lprintf("username: %s", username);
+	lprintf("tty %d", tty);
+	lprintf("session: %s", session);
 
 	pass = getpwnam(username);
 	if (!pass)

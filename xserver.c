@@ -23,7 +23,6 @@
 #include <signal.h>
 #include <pthread.h>
 #include <string.h>
-#include <linux/tiocl.h>
 #include <linux/limits.h>
 #include <linux/vt.h>
 #include <linux/kd.h>
@@ -38,7 +37,6 @@
 
 char displaydev[PATH_MAX];	/* "/dev/tty1" */
 char displayname[256] = ":0";	/* ":0" */
-int vtnum;	 		/* number part after /dev/tty */
 char xauth_cookie_file[PATH_MAX];
 Xauth x_auth;
 
@@ -58,48 +56,22 @@ static int xpid;
 void set_tty(void)
 {
 	int fd;
-	char msg[256];
-	unsigned char tiocl_sub = TIOCL_GETFGCONSOLE;
 
-	log_string("Entering set_tty");
+	lprintf("Entering set_tty");
 
 	/* switch to this console */
 	fd = open("/dev/console", O_RDWR);
 	if (fd < 0) {
-		log_string("Unable to open /dev/console, using stdin");
+		lprintf("Unable to open /dev/console, using stdin");
 		fd = 0;
 	}
 	ioctl(fd, VT_ACTIVATE, tty);
 	if (fd != 0)
 		close(fd);
 
-	/*
-	 * In a later version we need to be able to get the
-	 * terminal to start on from a command line parameter
-	 */
+	snprintf(displaydev, PATH_MAX, "/dev/tty%d", tty);
 
-	fd = open("/dev/console", O_RDWR);
-	if (fd < 0) {
-		log_string("Unable to open /dev/console, using stdin");
-		fd = 0;
-	}
-	vtnum = ioctl(fd, TIOCLINUX, &tiocl_sub);
-	if (fd != 0)
-		close(fd);
-
-	if (vtnum < 0) {
-		log_string("TIOCL_GETFGCONSOLE failed");
-		exit(EXIT_FAILURE);
-	}
-
-	/* kernel starts counting at 0 */
-	vtnum++;
-	// todo: use the tty from options.c
-
-	snprintf(displaydev, PATH_MAX, "/dev/tty%d", vtnum);
-
-	snprintf(msg, 256, "Using %s (vt%d) as display device", displaydev, vtnum);
-	log_string(msg);
+	lprintf("Using %s as display device", displaydev);
 }
 
 void setup_xauth(void)
@@ -107,15 +79,13 @@ void setup_xauth(void)
 	FILE *fp;
 	int fd;
 	static char cookie[16];
-	char msg[80];
-	unsigned int i;
 	struct utsname uts;
 
 	static char xau_address[80];
 	static char xau_number[] = "0"; // FIXME, detect correct displaynum
 	static char xau_name[] = "MIT-MAGIC-COOKIE-1";
 
-	log_string("Entering setup_xauth");
+	lprintf("Entering setup_xauth");
 
 	fp = fopen("/dev/urandom", "r");
 	if (!fp)
@@ -124,17 +94,9 @@ void setup_xauth(void)
 		return;
 	fclose(fp);
 
-	snprintf(msg, 80, "cookie = ");
-	for (i = 0; i < sizeof(cookie); i++) {
-		char c[256];
-		snprintf(c, 256, "%02x", (unsigned char)cookie[i]);
-		strcat(msg, c);
-	}
-	log_string(msg);
-
 	/* construct xauth data */
 	if (uname(&uts) < 0) {
-		log_string("uname failed");
+		lprintf("uname failed");
 		return;
 	}
 
@@ -155,22 +117,22 @@ void setup_xauth(void)
 
 	fd = mkstemp(xauth_cookie_file);
 	if (fd <= 0) {
-		log_string("unable to make tmp file for xauth");
+		lprintf("unable to make tmp file for xauth");
 		return;
 	}
 
-	log_string(xauth_cookie_file);
+	lprintf("Xauthg cookie file: %s", xauth_cookie_file);
 
 	fp = fdopen(fd, "a");
 	if (!fp) {
-		log_string("unable to open xauth fp");
+		lprintf("unable to open xauth fp");
 		close(fd);
 		return;
 	}
 
 	/* write it out to disk */
 	if (XauWriteAuth(fp, &x_auth) != 1)
-		log_string("unable to write xauth data to disk");
+		lprintf("unable to write xauth data to disk");
 
 	fclose(fp);
 }
@@ -216,7 +178,7 @@ void start_X_server(void)
 	int ret;
 	char vt[80];
 
-	log_string("Entering start_X_server");
+	lprintf("Entering start_X_server");
 
 	/* Step 1: arm the signal */
 	memset(&usr1, 0, sizeof(struct sigaction));
@@ -250,11 +212,11 @@ void start_X_server(void)
 	if (!xserver && !access("/usr/bin/X", X_OK))
 		xserver = "/usr/bin/X";
 	if (!xserver) {
-		log_string("No X server found!");
+		lprintf("No X server found!");
 		_exit(EXIT_FAILURE);
 	}
 
-	snprintf(vt, 80, "vt%d", vtnum);
+	snprintf(vt, 80, "vt%d", tty);
 
 	/* Step 4: start the X server */
 	execl(xserver, xserver,  displayname, "-nr", "-verbose", "-auth", xauth_cookie_file,
@@ -269,39 +231,39 @@ void start_X_server(void)
 void wait_for_X_signal(void)
 {
 	struct timespec tv;
-	log_string("Entering wait_for_X_signal");
+	lprintf("Entering wait_for_X_signal");
 	clock_gettime(CLOCK_REALTIME, &tv);
 	tv.tv_sec += 10;
 
 	pthread_mutex_lock(&notify_mutex);
 	pthread_cond_timedwait(&notify_condition, &notify_mutex, &tv);
 	pthread_mutex_unlock(&notify_mutex);
-	log_string("done");
+	lprintf("done");
 
 }
 
 void wait_for_X_exit(void)
 {	
 	int ret;
-	log_string("wait_for_X_exit");
+	lprintf("wait_for_X_exit");
 	while (!exiting) {
 		ret = waitpid(0, NULL, 0);
 		if (ret == xpid)
 			break;
 	}
-	log_string("X exited");
+	lprintf("X exited");
 }
 
 void set_text_mode(void)
 {
 	int fd;
 
-	log_string("Setting console mode to KD_TEXT");
+	lprintf("Setting console mode to KD_TEXT");
 
 	fd = open(displaydev, O_RDWR);
 
 	if (fd < 0) {
-		log_string("Unable to open /dev/console, using stdin");
+		lprintf("Unable to open /dev/console, using stdin");
 		fd = 0;
 	}
 	ioctl(fd, KDSETMODE, KD_TEXT);

@@ -81,11 +81,9 @@ static void do_desktop_file(const char *filename)
 	}
 	fclose(file);
 	if (show && strlen(exec)>0) {
-		char msg[4096];
 		char *ptrs[256];
 		int count = 0;
-		snprintf(msg, 4096, "Starting -%s-", exec);
-		log_string(msg);
+		lprintf("Starting -%s-", exec);
 		counter ++;
 
 		if (!fork()) {
@@ -116,12 +114,12 @@ void autostart_desktop_files(void)
 	DIR *dir;
 	struct dirent *entry;
 
-	log_string("Entering autostart_desktop_files");
+	lprintf("Entering autostart_desktop_files");
 	sleep(1);
 
 	dir = opendir("/etc/xdg/autostart");
 	if (!dir) {
-		log_string("Autostart directory not found");
+		lprintf("Autostart directory not found");
 		return;
 	}	
 
@@ -170,12 +168,13 @@ void start_desktop_session(void)
 	int ret;
 	int count = 0;
 	char *ptrs[256];
-	log_string("Entering start_desktop_session");
 
 	ret = fork();
 
 	if (ret)
 		return; /* parent continues */
+
+	lprintf("Entering start_desktop_session");
 
 	memset(ptrs, 0, sizeof(ptrs));
 
@@ -186,5 +185,5 @@ void start_desktop_session(void)
 	ret = execv(ptrs[0], ptrs);
 
 	if (ret != EXIT_SUCCESS)
-		log_string("Failure to start metacity");
+		lprintf("Failed to start %s", session);
 }

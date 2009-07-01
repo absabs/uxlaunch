@@ -34,7 +34,7 @@ void start_dbus_session_bus(void)
 	int ret;
 	ssize_t result;
 
-	log_string("Entering start_dbus_session_bus");
+	lprintf("Entering start_dbus_session_bus");
 
 	if (pipe(p_fd) < 0)
 		exit(EXIT_FAILURE);
@@ -70,7 +70,7 @@ void start_dbus_session_bus(void)
 
 void stop_dbus_session_bus(void)
 {
-	log_string("Entering stop_dbus_session_bus");
+	lprintf("Entering stop_dbus_session_bus");
 
 	kill(atoi(dbus_pid), SIGTERM);
 	unsetenv("DBUS_SESSION_BUS_PID");
