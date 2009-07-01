@@ -111,6 +111,8 @@ void get_options(int argc, char **argv)
 			if (!val)
 				continue;
 
+			// todo: chomp whitespace that trails or leads
+
 			if (!strcmp(key, "user"))
 				strncpy(username, val, 256);
 			if (!strcmp(key, "tty"))
