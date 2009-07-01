@@ -94,6 +94,7 @@ void set_tty(void)
 
 	/* kernel starts counting at 0 */
 	vtnum++;
+	// todo: use the tty from options.c
 
 	snprintf(displaydev, PATH_MAX, "/dev/tty%d", vtnum);
 

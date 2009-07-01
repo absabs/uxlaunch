@@ -104,7 +104,10 @@ void get_options(int argc, char **argv)
 		char *val;
 
 		while (fgets(buf, 80, f) != NULL) {
+			char *c;
 
+			c = strchr(buf, '\n');
+			if (c) *c = 0; /* remove trailing \n */
 			key = strtok(buf, "=");
 			if (!key)
 				continue;
