@@ -88,9 +88,10 @@ void get_options(int argc, char **argv)
 			continue;
 		/* and make sure this is actually the guys homedir */
 		snprintf(buf, 80, "/home/%s", u);
-		if (!strcmp(p->pw_dir, buf))
+		if (strcmp(p->pw_dir, buf))
 			continue;
 		strncpy(username, u, 256);
+		free(u);
 	}
 	if (dir)
 		closedir(dir);
