@@ -45,10 +45,16 @@ void switch_to_user(void)
 	int result;
 	FILE *fp;
 	char fn[PATH_MAX];
+	int ret;
 
 	lprintf("Entering switch_to_user");
 
 	initgroups(pass->pw_name, pass->pw_gid);
+
+	/* make sure that the user owns /dev/ttyX */
+	ret = chown(displaydev, pass->pw_uid, pass->pw_gid);
+	if (ret)
+		lprintf("Failed to fix /dev/tty permission");
 
 	if (!((setgid(pass->pw_gid) == 0) && (setuid(pass->pw_uid) == 0)))
 		exit(EXIT_FAILURE);

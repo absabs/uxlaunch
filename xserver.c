@@ -175,6 +175,7 @@ void start_X_server(void)
 	char *xserver = NULL;
 	int ret;
 	char vt[80];
+	struct stat statbuf;  
 
 	/* Step 1: arm the signal */
 	memset(&usr1, 0, sizeof(struct sigaction));
@@ -215,8 +216,14 @@ void start_X_server(void)
 	snprintf(vt, 80, "vt%d", tty);
 
 	/* Step 4: start the X server */
-	execl(xserver, xserver,  displayname, "-nr", "-verbose", "-auth", xauth_cookie_file,
-	      "-nolisten", "tcp", vt, NULL);
+	ret = stat(xserver, &statbuf);
+	if (!ret && statbuf.st_mode && S_ISUID) {
+		execl(xserver, xserver,  displayname, "-nr", "-verbose", "-auth", xauth_cookie_file,
+		      "-nolisten", "tcp", "-logfile", vt, NULL);
+	} else {
+		execl(xserver, xserver,  displayname, "-nr", "-verbose", "-auth", xauth_cookie_file,
+		      "-nolisten", "tcp", "-logfile", "/tmp/Xorg.0.log", "-nohwaccess", vt, NULL);
+	}
 	exit(0);
 }
 
