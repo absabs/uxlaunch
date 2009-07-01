@@ -112,7 +112,11 @@ void get_options(int argc, char **argv)
 			if (!val)
 				continue;
 
-			// todo: chomp whitespace that trails or leads
+			/* chomp() */
+			if (val[strlen(val) - 1] == '\n')
+				val[strlen(val) - 1] = '\0';
+
+			// todo: filter leading/trailing whitespace
 
 			if (!strcmp(key, "user"))
 				strncpy(username, val, 256);
