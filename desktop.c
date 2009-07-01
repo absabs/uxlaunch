@@ -170,12 +170,13 @@ void start_desktop_session(void)
 	int ret;
 	int count = 0;
 	char *ptrs[256];
-	log_string("Entering start_desktop_session");
 
 	ret = fork();
 
 	if (ret)
 		return; /* parent continues */
+
+	log_string("Entering start_desktop_session");
 
 	memset(ptrs, 0, sizeof(ptrs));
 
@@ -185,6 +186,9 @@ void start_desktop_session(void)
 	
 	ret = execv(ptrs[0], ptrs);
 
-	if (ret != EXIT_SUCCESS)
-		log_string("Failure to start metacity");
+	if (ret != EXIT_SUCCESS) {
+		char msg[256];
+		snprintf(msg, 256, "Failed to start %s", session);
+		log_string(msg);
+	}
 }
