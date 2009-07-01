@@ -31,10 +31,10 @@ char username[256] = "moblin";
 int verbose = 0;
 
 static struct option opts[] = {
-	{ "user", 1, NULL, 'u' },
-	{ "tty", 1, NULL, 't' },
+	{ "user",    1, NULL, 'u' },
+	{ "tty",     1, NULL, 't' },
 	{ "session", 1, NULL, 's' },
-	{ "help", 1, NULL, 'h' },
+	{ "help",    0, NULL, 'h' },
 	{ "verbose", 0, NULL, 'v' },
 	{ 0, 0, NULL, 0}
 };
