@@ -76,6 +76,8 @@ void switch_to_user(void)
 	snprintf(user_xauth_path, PATH_MAX, "%s/.Xauthority", pass->pw_dir);
 	setenv("XAUTHORITY", user_xauth_path, 1);
 
+	set_i18n();
+
 	result = chdir(pass->pw_dir);
 
 	fp = fopen(user_xauth_path, "w");
@@ -95,3 +97,45 @@ void switch_to_user(void)
 	}
 }
 
+void set_i18n(void)
+{
+	FILE *f;
+	lprintf("entering set_i18n");
+
+	/*
+	 * /etc/sysconfig/i18n contains shell code that sets
+	 * various i18n options in environment, typically:
+	 * LANG, SYSFONT
+	 */
+
+	f = fopen("/etc/sysconfig/i18n", "r");
+	if (f) {
+		char buf[256];
+		char *key;
+		char *val;
+
+		while (fgets(buf, 256, f) != NULL) {
+			char *c;
+
+			c = strchr(buf, '\n');
+			if (c) *c = 0; /* remove trailing \n */
+
+			key = strtok(buf, "=");
+			if (!key)
+				continue;
+			val = strtok(NULL, "=\""); /* note \" */
+			if (!val)
+				continue;
+
+			/* grab the stuff we need, avoiding comments
+			 * and other user stuff we don't care for now */
+			if (!strcmp(key, "LANG"))
+				setenv(key, val, 1);
+			if (!strcmp(key, "SYSFONT"))
+				setenv(key, val, 1);
+		}
+		fclose(f);
+	}
+
+	log_environment();
+}

@@ -126,3 +126,4 @@ void maybe_start_screensaver(void)
 			lprintf("Failed to launch /usr/bin/gnome-screensaver-command");
 	}
 }
+

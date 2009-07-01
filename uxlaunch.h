@@ -21,6 +21,7 @@ extern char username[];
 extern int verbose;
 
 extern void get_options(int argc, char **argv);
+extern void set_i18n(void);
 extern void setup_pam_session(void);
 extern void close_pam_session(void);
 extern void switch_to_user(void);
