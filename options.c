@@ -167,9 +167,8 @@ void get_options(int argc, char **argv)
 		}
 	}
 
-	lprintf("username: %s", username);
-	lprintf("tty %d", tty);
-	lprintf("session: %s", session);
+	lprintf("uxlaunch v%s started.", VERSION);
+	lprintf("user \"%s\", tty #%d, session \"%s\"", username, tty, session);
 
 	pass = getpwnam(username);
 	if (!pass)

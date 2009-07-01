@@ -2,7 +2,7 @@
  * This file is part of uxlaunch
  *
  * (C) Copyright 2009 Intel Corporation
- * Authors: 
+ * Authors:
  *     Auke Kok <auke@linux.intel.com>
  *     Arjan van de Ven <arjan@linux.intel.com>
  *
@@ -31,8 +31,6 @@ void start_ssh_agent(void)
 	FILE *file;
 	char line[4096];
 
-	lprintf("Entering start_ssh_agent");
-
 	memset(line, 0, 4096);
 
 	file = popen("/usr/bin/ssh-agent", "r");
@@ -46,7 +44,7 @@ void start_ssh_agent(void)
 	 * SSH_AUTH_SOCK=/tmp/ssh-ccZMs16230/agent.16230; export SSH_AUTH_SOCK;
 	 * SSH_AGENT_PID=16231; export SSH_AGENT_PID;
 	 * echo Agent pid 16231;
-	 * 
+	 *
 	 * so search for "; export", cut that off. Then split at the = for env var name
 	 * and value.
 	 */
@@ -85,8 +83,6 @@ void start_bash(void)
 {
 	int ret;
 
-	lprintf("Entering start_bash");
-
 	fprintf(stderr, "Starting bash shell -- type exit to continue\n");
 	ret = system("/bin/bash");
 	if (ret != EXIT_SUCCESS)
@@ -100,8 +96,6 @@ void start_bash(void)
 void start_gconf(void)
 {
 	int ret;
-
-	lprintf("Entering start_gconf");
 
 	ret = system("gconftool-2 --spawn");
 	if (ret)
@@ -120,8 +114,6 @@ void start_gconf(void)
 void maybe_start_screensaver(void)
 {
 	int ret;
-
-	lprintf("Entering maybe_start_screensaver");
 
 	/* the screensaver becomes a daemon */
 	ret = system("/usr/bin/gnome-screensaver"); 

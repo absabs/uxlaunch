@@ -38,8 +38,6 @@ void setup_pam_session(void)
 	char x[256];
 	int err;
 
-	lprintf("Entering setup_pam_session");
-
 	snprintf(x, 256, "tty%d", tty);
 
 	err = pam_start("login", pass->pw_name, &pc, &ph);
@@ -66,8 +64,6 @@ void setup_pam_session(void)
 void close_pam_session(void)
 {
 	int err;
-
-	lprintf("Entering close_pam_session");
 
 	err = pam_close_session(ph, 0);
 	if (err)

@@ -88,7 +88,7 @@ void lprintf(const char* fmt, ...)
 		fflush(log);
 	} else {
 		logfile_enabled = 0;
-		lprintf("Unable to write logfile, file logging disabled");
+		lprintf("unable to write logfile, file logging disabled");
 	}
 }
 
@@ -99,12 +99,11 @@ void log_environment(void)
 
 	env = environ;
 	
-	lprintf("Dumping environment");
-	lprintf("----------------------------------");
+	lprintf("--- environment variable dump:");
 	while (*env) {
-		lprintf(*env);
+		lprintf("    %s", *env);
 		env++;
 	}
-	lprintf("----------------------------------");
+	lprintf("---");
 }
 

@@ -14,7 +14,8 @@ OBJS := uxlaunch.o consolekit.o dbus.o desktop.o misc.o pam.o user.o xserver.o \
 CFLAGS += -Wall -W -Os -g -fstack-protector -D_FORTIFY_SOURCE=2 -Wformat -fno-common \
 	 -Wimplicit-function-declaration  -Wimplicit-int \
 	`pkg-config --cflags dbus-1` \
-	`pkg-config --cflags ck-connector`
+	`pkg-config --cflags ck-connector` \
+	-D VERSION=\"$(VERSION)\"
 
 LDADD  += `pkg-config --libs dbus-1` \
 	  `pkg-config --libs ck-connector` \

@@ -43,8 +43,6 @@ void setup_consolekit_session(void)
 	char *d = &displaydev[0];
 	char *n = &displayname[0];
 
-	lprintf("Entering setup_consolekit_session");
-
 	connector = ck_connector_new();
 	if (!connector)
 		exit(EXIT_FAILURE);
@@ -81,8 +79,6 @@ void setup_consolekit_session(void)
  */
 void close_consolekit_session(void)
 {
-	lprintf("Entering close_consolekit_session");
-
 	DBusError error;
 
 	dbus_error_init(&error);

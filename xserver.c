@@ -85,8 +85,6 @@ void setup_xauth(void)
 	static char xau_number[] = "0"; // FIXME, detect correct displaynum
 	static char xau_name[] = "MIT-MAGIC-COOKIE-1";
 
-	lprintf("Entering setup_xauth");
-
 	fp = fopen("/dev/urandom", "r");
 	if (!fp)
 		return;
@@ -177,8 +175,6 @@ void start_X_server(void)
 	char *xserver = NULL;
 	int ret;
 	char vt[80];
-
-	lprintf("Entering start_X_server");
 
 	/* Step 1: arm the signal */
 	memset(&usr1, 0, sizeof(struct sigaction));

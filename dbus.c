@@ -34,8 +34,6 @@ void start_dbus_session_bus(void)
 	int ret;
 	ssize_t result;
 
-	lprintf("Entering start_dbus_session_bus");
-
 	if (pipe(p_fd) < 0)
 		exit(EXIT_FAILURE);
 	if (pipe(a_fd) < 0) {
@@ -46,6 +44,8 @@ void start_dbus_session_bus(void)
 
 	snprintf(cmd, 254, "dbus-daemon --fork --session --print-pid %d --print-address %d",
 		p_fd[1], a_fd[1]);
+
+	lprintf("launching session bus: %s", cmd);
 
 	ret = system(cmd);
 
@@ -70,8 +70,6 @@ void start_dbus_session_bus(void)
 
 void stop_dbus_session_bus(void)
 {
-	lprintf("Entering stop_dbus_session_bus");
-
 	kill(atoi(dbus_pid), SIGTERM);
 	unsetenv("DBUS_SESSION_BUS_PID");
 	unsetenv("DBUS_SESSION_BUS_ADDRESS");
