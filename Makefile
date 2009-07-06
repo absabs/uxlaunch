@@ -23,15 +23,18 @@ LDADD  += `pkg-config --libs dbus-1` \
 	  `pkg-config --libs glib-2.0` \
 	  -lpam -lpthread -lrt -lXau
 
-uxlaunch: $(OBJS) Makefile
-	$(CC) -o uxlaunch $(OBJS) $(LDADD) $(LDFLAGS)
+%.o: %.c
+	@echo "  CC  $<"
+	@$(CC) $(CFLAGS) -c -o $@ $<
 
-.SILENT:
+uxlaunch: $(OBJS) Makefile
+	@echo "  LD  $@"
+	@$(CC) -o $@ $(OBJS) $(LDADD) $(LDFLAGS)
 
 clean:
 	rm -rf *.o *~ uxlaunch
 
 dist:
 	git tag v$(VERSION)
-	git archive --format=tar -v --prefix="uxlaunch-$(VERSION)/" v$(VERSION) | \
+	git archive --format=tar --prefix="uxlaunch-$(VERSION)/" v$(VERSION) | \
 		gzip > uxlaunch-$(VERSION).tar.gz
