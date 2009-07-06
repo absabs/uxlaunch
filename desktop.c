@@ -49,7 +49,7 @@ static void desktop_entry_add(const char *exec, int prio)
 	struct desktop_entry_struct *entry;
 
 	/* make sure we don't insert items twice */
-	item = desktop_entries;
+	item = g_list_first(desktop_entries);
 	while (item) {
 		entry = item->data;
 		if (!strcmp(entry->exec, exec)) {
@@ -203,7 +203,7 @@ void do_autostart(void)
 	/* sort by priority */
 	desktop_entries = g_list_sort(desktop_entries, sort_entries);
 
-	item = desktop_entries;
+	item = g_list_first(desktop_entries);
 
 	while (item) {
 		char *ptrs[256];
