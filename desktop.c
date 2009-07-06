@@ -42,6 +42,44 @@ struct desktop_entry_struct {
 
 static GList *desktop_entries;
 
+
+static void desktop_entry_add(const char *exec, int prio)
+{
+	GList *item;
+	struct desktop_entry_struct *entry;
+
+	/* make sure we don't insert items twice */
+	item = desktop_entries;
+	while (item) {
+		entry = item->data;
+		if (!strcmp(entry->exec, exec))
+			return;
+	}
+
+	entry = malloc(sizeof(struct desktop_entry_struct));
+	if (!entry) {
+		lprintf("Error allocating memory for desktop entry");
+		return;
+	}
+	entry->prio = prio; /* panels start at highest prio */
+	entry->exec = g_strdup(exec);
+	lprintf("Adding %s with prio %d", entry->exec, entry->prio);
+	desktop_entries = g_list_prepend(desktop_entries, entry);
+}
+
+
+gint sort_entries(gconstpointer a, gconstpointer b)
+{
+	const struct desktop_entry_struct *A = a, *B = b;
+
+	if (A->prio > B->prio)
+		return 1;
+	if (A->prio < B->prio)
+		return -1;
+	return strcmp(A->exec, B->exec);
+}
+
+
 /*
  * Process a .desktop file
  * Objective: fine the "Exec=" line which has the command to run
@@ -99,32 +137,55 @@ static void do_desktop_file(const char *filename)
 	}
 	fclose(file);
 
-	if (show && strlen(exec)>0) {
-		struct desktop_entry_struct *entry;
-
-		entry = malloc(sizeof(struct desktop_entry_struct));
-		if (!entry) {
-			lprintf("Error allocating memory for desktop entry");
-			return;
-		}
-
-		entry->exec = g_strdup(exec);
-		entry->prio = prio;
-		lprintf("Adding %s with prio %d", entry->exec, entry->prio);
-		desktop_entries = g_list_prepend(desktop_entries, entry);
-	}
+	if (show && strlen(exec)>0)
+		desktop_entry_add(exec, prio);
 }
 
 
-gint sort_entries(gconstpointer a, gconstpointer b)
+void autostart_panels(void)
 {
-	const struct desktop_entry_struct *A = a, *B = b;
+	desktop_entry_add("/usr/libexec/moblin-panel-myzone", -1);
+	desktop_entry_add("/usr/libexec/moblin-panel-status", -1);
+	desktop_entry_add("/usr/libexec/moblin-panel-people", -1);
+	desktop_entry_add("/usr/libexec/moblin-panel-internet", -1);
+	desktop_entry_add("/usr/libexec/moblin-panel-media", -1);
+	desktop_entry_add("/usr/libexec/moblin-panel-pasteboard", -1);
+	desktop_entry_add("/usr/libexec/moblin-panel-applications", -1);
+}
 
-	if (A->prio > B->prio)
-		return 1;
-	if (A->prio < B->prio)
-		return -1;
-	return strcmp(A->exec, B->exec);
+
+/*
+ * We need to process all the .desktop files in /etc/xdg/autostart.
+ * Simply walk the directory
+ */
+void autostart_desktop_files(void)
+{
+	DIR *dir;
+	struct dirent *entry;
+
+	lprintf("Entering autostart_desktop_files");
+
+	dir = opendir("/etc/xdg/autostart");
+	if (!dir) {
+		lprintf("Autostart directory not found");
+		return;
+	}	
+
+	while (1) {
+		char filename[PATH_MAX];
+		entry = readdir(dir);
+		if (!entry)
+			break;
+		if (entry->d_name[0] == '.')
+			continue;
+		if (entry->d_type != DT_REG)
+			continue;
+		if (strchr(entry->d_name, '~'))
+			continue;  /* editor backup file */
+		snprintf(filename, 4096, "/etc/xdg/autostart/%s", entry->d_name);
+		do_desktop_file(filename);
+	}
+	closedir(dir);
 }
 
 
@@ -174,65 +235,6 @@ void do_autostart(void)
 	}
 }
 
-/*
- * We need to process all the .desktop files in /etc/xdg/autostart.
- * Simply walk the directory
- */
-void autostart_desktop_files(void)
-{
-	DIR *dir;
-	struct dirent *entry;
-
-	lprintf("Entering autostart_desktop_files");
-
-	dir = opendir("/etc/xdg/autostart");
-	if (!dir) {
-		lprintf("Autostart directory not found");
-		return;
-	}	
-
-	while (1) {
-		char filename[PATH_MAX];
-		entry = readdir(dir);
-		if (!entry)
-			break;
-		if (entry->d_name[0] == '.')
-			continue;
-		if (entry->d_type != DT_REG)
-			continue;
-		if (strchr(entry->d_name, '~'))
-			continue;  /* editor backup file */
-		snprintf(filename, 4096, "/etc/xdg/autostart/%s", entry->d_name);
-		do_desktop_file(filename);
-	}
-	closedir(dir);
-}
-
-static void start_panel(const char *exec)
-{
-	struct desktop_entry_struct *entry;
-
-	entry = malloc(sizeof(struct desktop_entry_struct));
-	if (!entry) {
-		lprintf("Error allocating memory for desktop entry");
-		return;
-	}
-	entry->prio = -1; /* panels start at highest prio */
-	entry->exec = g_strdup(exec);
-	lprintf("Adding %s with prio %d", entry->exec, entry->prio);
-	desktop_entries = g_list_prepend(desktop_entries, entry);
-}
-
-void autostart_panels(void)
-{
-	start_panel("/usr/libexec/moblin-panel-myzone");
-	start_panel("/usr/libexec/moblin-panel-status");
-	start_panel("/usr/libexec/moblin-panel-people");
-	start_panel("/usr/libexec/moblin-panel-internet");
-	start_panel("/usr/libexec/moblin-panel-media");
-	start_panel("/usr/libexec/moblin-panel-pasteboard");
-	start_panel("/usr/libexec/moblin-panel-applications");
-}
 
 void start_desktop_session(void)
 {
@@ -258,3 +260,4 @@ void start_desktop_session(void)
 	if (ret != EXIT_SUCCESS)
 		lprintf("Failed to start %s", session);
 }
+
