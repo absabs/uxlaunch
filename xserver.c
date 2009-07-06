@@ -161,6 +161,9 @@ static void termhandler(int foo)
 	 * This kills ONLY the X server, everything else will be killed
 	 * when we exit the waitpid() loop.
 	 */
+	if (session_pid)
+		kill(session_pid, SIGKILL);
+
 	kill(xpid, SIGTERM);
 }
 

@@ -18,6 +18,8 @@ extern int tty;
 extern char session[];
 extern char username[];
 
+extern int session_pid;
+
 extern int verbose;
 
 extern void get_options(int argc, char **argv);
