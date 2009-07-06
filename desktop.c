@@ -52,8 +52,11 @@ static void desktop_entry_add(const char *exec, int prio)
 	item = desktop_entries;
 	while (item) {
 		entry = item->data;
-		if (!strcmp(entry->exec, exec))
+		if (!strcmp(entry->exec, exec)) {
+			lprintf("Duplicate entry %s", exec);
 			return;
+		}
+		item = g_list_next(item);
 	}
 
 	entry = malloc(sizeof(struct desktop_entry_struct));
@@ -169,7 +172,7 @@ void autostart_desktop_files(void)
 	if (!dir) {
 		lprintf("Autostart directory not found");
 		return;
-	}	
+	}
 
 	while (1) {
 		char filename[PATH_MAX];
