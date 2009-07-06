@@ -19,6 +19,7 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include <time.h>
+#include <glib.h>
 
 #include "uxlaunch.h"
 #if defined(__i386__)
@@ -33,6 +34,13 @@
 #define IOPRIO_CLASS_SHIFT 13
 #define IOPRIO_IDLE_LOWEST (7 | (IOPRIO_CLASS_IDLE << IOPRIO_CLASS_SHIFT))
 
+
+struct desktop_entry_struct {
+	char *exec;
+	int prio;
+};
+
+static GList *desktop_entries;
 
 /*
  * Process a .desktop file
@@ -50,7 +58,7 @@ static void do_desktop_file(const char *filename)
 	char line[4096];
 	char exec[4096];
 	int show = 1;
-	static int counter = 5;
+	int prio = 1; /* medium/normal prio */
 
 	file = fopen(filename, "r");
 	if (!file)
@@ -62,7 +70,7 @@ static void do_desktop_file(const char *filename)
 		if (fgets(line, 4096, file) == NULL)
 			break;
 		c = strchr(line, '\n');
-		if (c) *c = 0;	
+		if (c) *c = 0;
 		if (strstr(line, "Exec="))
 			strncpy(exec, line+5, 4095);
 
@@ -77,37 +85,98 @@ static void do_desktop_file(const char *filename)
 			if (strstr(line, "GNOME"))
 				show = 0;
 		}
-		
+
+		if (strstr(line, "X-Moblin-Priority")) {
+			if (strstr(line, "Highest"))
+				prio = -1;
+			if (strstr(line, "High"))
+				prio = 0;
+			/* default: prio = 1 */
+			if (strstr(line, "Low"))
+				prio = 2;
+
+		}
 	}
 	fclose(file);
+
 	if (show && strlen(exec)>0) {
+		struct desktop_entry_struct *entry;
+
+		entry = malloc(sizeof(struct desktop_entry_struct));
+		if (!entry) {
+			lprintf("Error allocating memory for desktop entry");
+			return;
+		}
+
+		entry->exec = g_strdup(exec);
+		entry->prio = prio;
+		lprintf("Adding %s with prio %d", entry->exec, entry->prio);
+		desktop_entries = g_list_prepend(desktop_entries, entry);
+	}
+}
+
+
+gint sort_entries(gconstpointer a, gconstpointer b)
+{
+	const struct desktop_entry_struct *A = a, *B = b;
+
+	if (A->prio > B->prio)
+		return 1;
+	if (A->prio < B->prio)
+		return -1;
+	return strcmp(A->exec, B->exec);
+}
+
+
+void do_autostart(void)
+{
+	GList *item;
+	struct desktop_entry_struct *entry;
+	static int delay = 0;
+
+	lprintf("Entering do_autostart");
+
+	/* sort by priority */
+	desktop_entries = g_list_sort(desktop_entries, sort_entries);
+
+	item = desktop_entries;
+
+	while (item) {
 		char *ptrs[256];
 		int count = 0;
-		lprintf("Starting -%s-", exec);
-		counter ++;
+		int ret = 0;
 
-		if (!fork()) {
-			int ret;
+		entry = item->data;
+
+		delay = delay + ((1 << (entry->prio + 1)) * 50000);
+		lprintf("Queueing %s with prio %d at %d", entry->exec, entry->prio, delay);
+
+		if (fork()) {
+			item = g_list_next(item);
+			continue;
+		}
+
+		if (entry->prio >= 1) {
 			syscall(__NR_ioprio_set, IOPRIO_WHO_PROCESS, 0, IOPRIO_IDLE_LOWEST);
 			ret = nice(5);
-
-			memset(ptrs, 0, sizeof(ptrs));
-
-			ptrs[0] = strtok(exec, " \t");
-			while (ptrs[count] && count < 255) {
-				ptrs[++count] = strtok(NULL, " \t");
-			}
-
-			usleep(200000 * counter);
-			execvp(ptrs[0], ptrs);
-			exit(ret);
 		}
+
+		memset(ptrs, 0, sizeof(ptrs));
+
+		ptrs[0] = strtok(entry->exec, " \t");
+		while (ptrs[count] && count < 255)
+			ptrs[++count] = strtok(NULL, " \t");
+
+		usleep(delay);
+		lprintf("Starting %s with prio %d at %d", entry->exec, entry->prio, delay);
+		execvp(ptrs[0], ptrs);
+		exit(ret);
 	}
 }
 
 /*
  * We need to process all the .desktop files in /etc/xdg/autostart.
- * Simply walk the directory 
+ * Simply walk the directory
  */
 void autostart_desktop_files(void)
 {
@@ -115,7 +184,6 @@ void autostart_desktop_files(void)
 	struct dirent *entry;
 
 	lprintf("Entering autostart_desktop_files");
-	sleep(1);
 
 	dir = opendir("/etc/xdg/autostart");
 	if (!dir) {
@@ -140,19 +208,22 @@ void autostart_desktop_files(void)
 	closedir(dir);
 }
 
-static void start_panel(char *command)
+static void start_panel(const char *exec)
 {
-	static int counter = - 1;
+	struct desktop_entry_struct *entry;
 
-	counter++;
-	if (fork())
-		return; /* parent */
-
-	usleep(counter * 50000);
-	execl(command, command, NULL);
+	entry = malloc(sizeof(struct desktop_entry_struct));
+	if (!entry) {
+		lprintf("Error allocating memory for desktop entry");
+		return;
+	}
+	entry->prio = -1; /* panels start at highest prio */
+	entry->exec = g_strdup(exec);
+	lprintf("Adding %s with prio %d", entry->exec, entry->prio);
+	desktop_entries = g_list_prepend(desktop_entries, entry);
 }
 
-void start_panels(void)
+void autostart_panels(void)
 {
 	start_panel("/usr/libexec/moblin-panel-myzone");
 	start_panel("/usr/libexec/moblin-panel-status");

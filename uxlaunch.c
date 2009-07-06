@@ -77,9 +77,9 @@ int main(int argc, char **argv)
 
 	start_desktop_session();
 
-	start_panels();
-
+	autostart_panels();
 	autostart_desktop_files();
+	do_autostart();
 
 	wait_for_X_exit();
 
