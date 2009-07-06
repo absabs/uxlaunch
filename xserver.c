@@ -157,8 +157,11 @@ static void termhandler(int foo)
 	 * we received either:
 	 * - a TERM from init when switching to init 3
 	 * - an INT from a ^C press in the console when running in fg
+	 *
+	 * This kills ONLY the X server, everything else will be killed
+	 * when we exit the waitpid() loop.
 	 */
-	kill(xpid, SIGKILL);
+	kill(xpid, SIGTERM);
 }
 
 /*
