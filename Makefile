@@ -1,4 +1,4 @@
-VERSION = 0.11
+VERSION = 0.12
 
 CC := gcc
 
@@ -23,7 +23,7 @@ LDADD  += `pkg-config --libs dbus-1` \
 	  `pkg-config --libs glib-2.0` \
 	  -lpam -lpthread -lrt -lXau
 
-%.o: %.c
+%.o: %.c uxlaunch.h Makefile
 	@echo "  CC  $<"
 	@$(CC) $(CFLAGS) -c -o $@ $<
 

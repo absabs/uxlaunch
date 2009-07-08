@@ -35,6 +35,8 @@
 #define IOPRIO_IDLE_LOWEST (7 | (IOPRIO_CLASS_IDLE << IOPRIO_CLASS_SHIFT))
 
 
+int session_pid;
+
 struct desktop_entry_struct {
 	char *exec;
 	int prio;
@@ -247,8 +249,10 @@ void start_desktop_session(void)
 
 	ret = fork();
 
-	if (ret)
+	if (ret) {
+		session_pid = ret;
 		return; /* parent continues */
+	}
 
 	lprintf("Entering start_desktop_session");
 
