@@ -256,6 +256,10 @@ void start_desktop_session(void)
 
 	lprintf("Entering start_desktop_session");
 
+	ret = system("/usr/bin/xdg-user-dirs-update");
+	if (ret)
+		lprintf("/usr/bin/xdg-user-dirs-update failed");
+
 	memset(ptrs, 0, sizeof(ptrs));
 
 	ptrs[0] = strtok(session, " \t");
