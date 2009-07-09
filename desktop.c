@@ -37,6 +37,7 @@
 
 int session_pid;
 char session_filter[16] = "MOBLIN";
+static int delay = 0;
 
 struct desktop_entry_struct {
 	char *exec;
@@ -204,11 +205,44 @@ void autostart_desktop_files(void)
 }
 
 
+void start_xinitrd_scripts(void)
+{
+	DIR* dir;
+
+	dir = opendir("/etc/X11/xinit/xinitrc.d");
+	while (dir) {
+		int ret;
+		struct dirent *entry;
+		char cmd[PATH_MAX];
+
+		entry = readdir(dir);
+		if (!entry)
+			break;
+		if (entry->d_type != DT_REG)
+			continue;
+
+		/* queue every 0.4s after xdg/autostart stuff */
+		delay = delay + 400000;
+
+		if (fork())
+			continue;
+
+		usleep(delay);
+
+		snprintf(cmd, PATH_MAX, "/etc/X11/xinit/xinitrc.d/%s", entry->d_name);
+		lprintf("Starting \"%s\" at %d", cmd, delay);
+		ret = system(cmd);
+		if (ret)
+			lprintf("Warning: \"%s\" returned %d", cmd, ret);
+		exit(ret);
+	}
+}
+
+
 void do_autostart(void)
 {
 	GList *item;
 	struct desktop_entry_struct *entry;
-	static int delay = 0;
 
 	lprintf("Entering do_autostart");
 
@@ -248,6 +282,8 @@ void do_autostart(void)
 		execvp(ptrs[0], ptrs);
 		exit(ret);
 	}
+
+	start_xinitrd_scripts();
 }
 
 
