@@ -36,6 +36,7 @@
 
 
 int session_pid;
+char session_filter[16] = "MOBLIN";
 
 struct desktop_entry_struct {
 	char *exec;
@@ -117,16 +118,17 @@ static void do_desktop_file(const char *filename)
 		if (strstr(line, "Exec="))
 			strncpy(exec, line+5, 4095);
 
-
 		if (strstr(line, "OnlyShowIn"))
-			if (strstr(line, "MOBLIN") == NULL)
+			if (strstr(line, session_filter) == NULL)
 				show = 0;
 
 		if (strstr(line, "NotShowIn")) {
-			if (strstr(line, "MOBLIN"))
+			if (strstr(line, session_filter))
 				show = 0;
-			if (strstr(line, "GNOME"))
-				show = 0;
+			/* for moblin, hide stuff hidden to gnome */
+			if (!strcmp(session_filter, "MOBLIN"))
+				if (strstr(line, "GNOME"))
+					show = 0;
 		}
 
 		if (strstr(line, "X-Moblin-Priority")) {
@@ -169,6 +171,14 @@ void autostart_desktop_files(void)
 	struct dirent *entry;
 
 	lprintf("Entering autostart_desktop_files");
+
+	/* adjust filter based on what our session cmd is */
+	if (strstr(session, "xfce"))
+		snprintf(session_filter, 16, "XFCE");
+	if (strstr(session, "gnome"))
+		snprintf(session_filter, 16, "GNOME");
+	if (strstr(session, "kde"))
+		snprintf(session_filter, 16, "KDE");
 
 	dir = opendir("/etc/xdg/autostart");
 	if (!dir) {
