@@ -73,6 +73,8 @@ int main(int argc, char **argv)
 
 	/* dbus needs the CK env var */
 	start_dbus_session_bus();
+
+	/* gconf needs dbus */
 	start_gconf();
 
 	maybe_start_screensaver();
