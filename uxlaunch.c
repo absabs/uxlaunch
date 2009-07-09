@@ -65,13 +65,15 @@ int main(int argc, char **argv)
 	 * so can happen while X is talking to the
 	 * hardware
 	 */
-	start_dbus_session_bus();
 	start_ssh_agent();
-	start_gconf();
 
 	wait_for_X_signal();
 
 	setup_consolekit_session();
+
+	/* dbus needs the CK env var */
+	start_dbus_session_bus();
+	start_gconf();
 
 	maybe_start_screensaver();
 
