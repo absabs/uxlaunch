@@ -81,6 +81,7 @@ int main(int argc, char **argv)
 
 	start_desktop_session();
 
+	get_session_type();
 	autostart_panels();
 	autostart_desktop_files();
 	do_autostart();

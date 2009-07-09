@@ -152,6 +152,10 @@ static void do_desktop_file(const char *filename)
 
 void autostart_panels(void)
 {
+
+	if (!strstr(session_filter, "MOBLIN"))
+		return;
+
 	desktop_entry_add("/usr/libexec/moblin-panel-myzone", -1);
 	desktop_entry_add("/usr/libexec/moblin-panel-status", -1);
 	desktop_entry_add("/usr/libexec/moblin-panel-people", -1);
@@ -161,6 +165,18 @@ void autostart_panels(void)
 	desktop_entry_add("/usr/libexec/moblin-panel-applications", 0);
 }
 
+
+void get_session_type(void)
+{
+	/* adjust filter based on what our session cmd is */
+	if (strstr(session, "xfce"))
+		snprintf(session_filter, 16, "XFCE");
+	if (strstr(session, "gnome"))
+		snprintf(session_filter, 16, "GNOME");
+	if (strstr(session, "kde"))
+		snprintf(session_filter, 16, "KDE");
+	/* default == MOBLIN */
+}
 
 /*
  * We need to process all the .desktop files in /etc/xdg/autostart.
@@ -172,14 +188,6 @@ void autostart_desktop_files(void)
 	struct dirent *entry;
 
 	lprintf("Entering autostart_desktop_files");
-
-	/* adjust filter based on what our session cmd is */
-	if (strstr(session, "xfce"))
-		snprintf(session_filter, 16, "XFCE");
-	if (strstr(session, "gnome"))
-		snprintf(session_filter, 16, "GNOME");
-	if (strstr(session, "kde"))
-		snprintf(session_filter, 16, "KDE");
 
 	dir = opendir("/etc/xdg/autostart");
 	if (!dir) {
