@@ -39,6 +39,12 @@ int session_pid;
 char session_filter[16] = "MOBLIN";
 static int delay = 0;
 
+/*
+ * 50ms steps in between async job startups
+ * lower priority jobs are started up further apart
+ */
+#define DELAY_UNIT 50000
+
 struct desktop_entry_struct {
 	char *exec;
 	int prio;
@@ -230,7 +236,7 @@ void start_xinitrd_scripts(void)
 			continue;
 
 		/* queue every 0.4s after xdg/autostart stuff */
-		delay = delay + 400000;
+		delay = delay + 8 * DELAY_UNIT;
 
 		if (fork())
 			continue;
@@ -266,7 +272,7 @@ void do_autostart(void)
 
 		entry = item->data;
 
-		delay = delay + ((1 << (entry->prio + 1)) * 50000);
+		delay = delay + ((1 << (entry->prio + 1)) * DELAY_UNIT);
 		lprintf("Queueing %s with prio %d at %d", entry->exec, entry->prio, delay);
 
 		if (fork()) {
