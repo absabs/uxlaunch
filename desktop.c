@@ -166,9 +166,9 @@ void autostart_panels(void)
 	desktop_entry_add("/usr/libexec/moblin-panel-status", -1);
 	desktop_entry_add("/usr/libexec/moblin-panel-people", -1);
 	desktop_entry_add("/usr/libexec/moblin-panel-internet", 0);
-	desktop_entry_add("/usr/libexec/moblin-panel-media", -1);
-	desktop_entry_add("/usr/libexec/moblin-panel-pasteboard", -1);
-	desktop_entry_add("/usr/libexec/moblin-panel-applications", 0);
+	desktop_entry_add("/usr/libexec/moblin-panel-media", 0);
+	desktop_entry_add("/usr/libexec/moblin-panel-pasteboard", 0);
+	desktop_entry_add("/usr/libexec/moblin-panel-applications", 1);
 }
 
 
