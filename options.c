@@ -109,7 +109,7 @@ void get_options(int argc, char **argv)
 			if (c) *c = 0; /* remove trailing \n */
 
 			if (buf[0] == '#')
-				continue;
+				continue; /* comment line */
 
 			key = strtok(buf, "=");
 			if (!key)
