@@ -108,6 +108,9 @@ void get_options(int argc, char **argv)
 			c = strchr(buf, '\n');
 			if (c) *c = 0; /* remove trailing \n */
 
+			if (buf[0] == '#')
+				continue;
+
 			key = strtok(buf, "=");
 			if (!key)
 				continue;
