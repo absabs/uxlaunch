@@ -1,0 +1,13 @@
+#
+# uxlaunch configuration file - /etc/sysconfig/uxlaunch
+#
+
+# Lines starting with '#' are ignored.
+#
+# Format of the lines should be `key=value`. don't use spaces or quotes
+# except in values where they are needed.
+#
+# defaults:
+#user=moblin
+#session=/usr/bin/mutter --sm-disable
+#tty=2

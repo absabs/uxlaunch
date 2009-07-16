@@ -5,8 +5,10 @@ CC := gcc
 all: uxlaunch
 
 install: uxlaunch
-	mkdir -p $(DESTDIR)/usr/sbin
+	mkdir -p $(DESTDIR)/usr/sbin $(DESTDIR)/etc/sysconfig/
 	install uxlaunch $(DESTDIR)/usr/sbin/
+	[ -f $(DESTDIR)/etc/sysconfig/uxlaunch ] || \
+	    install uxlaunch.sysconfig $(DESTDIR)/etc/sysconfig/uxlaunch
 
 OBJS := uxlaunch.o consolekit.o dbus.o desktop.o misc.o pam.o user.o xserver.o \
 	lib.o options.o
