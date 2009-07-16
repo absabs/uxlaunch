@@ -161,6 +161,8 @@ void autostart_panels(void)
 
 	if (!strstr(session_filter, "MOBLIN"))
 		return;
+	if (!strstr(session, "mutter"))
+		return;
 
 	desktop_entry_add("/usr/libexec/moblin-panel-myzone", -1);
 	desktop_entry_add("/usr/libexec/moblin-panel-status", -1);
