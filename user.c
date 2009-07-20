@@ -21,6 +21,9 @@
 #include <sys/types.h>
 #include <pwd.h>
 #include <grp.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+
 
 #include "uxlaunch.h"
 
@@ -75,6 +78,12 @@ void switch_to_user(void)
 	setenv("PATH", buf, 1);
 	snprintf(user_xauth_path, PATH_MAX, "%s/.Xauthority", pass->pw_dir);
 	setenv("XAUTHORITY", user_xauth_path, 1);
+	snprintf(buf, PATH_MAX, "%s/.cache", pass->pw_dir);
+	mkdir(buf, 0600);
+	setenv("XDG_CACHE_HOME", buf, 0);
+	snprintf(buf, PATH_MAX, "%s/.config", pass->pw_dir);
+	setenv("XDG_CONFIG_HOME", buf, 0);
+	setenv("OOO_FORCE_DESKTOP","gnome", 0);
 
 	set_i18n();
 
@@ -102,6 +111,9 @@ void set_i18n(void)
 	FILE *f;
 	lprintf("entering set_i18n");
 
+	setenv("GTK_IM_MODULE", "scim-bridge", 0);
+	setenv("CLUTTER_IM_MODULE","scim-bridge", 0);
+
 	/*
 	 * /etc/sysconfig/i18n contains shell code that sets
 	 * various i18n options in environment, typically:
@@ -119,6 +131,8 @@ void set_i18n(void)
 
 			c = strchr(buf, '\n');
 			if (c) *c = 0; /* remove trailing \n */
+			if (buf[0] == '#')
+				continue; /* skip comments */
 
 			key = strtok(buf, "=");
 			if (!key)
