@@ -79,7 +79,7 @@ void switch_to_user(void)
 	snprintf(user_xauth_path, PATH_MAX, "%s/.Xauthority", pass->pw_dir);
 	setenv("XAUTHORITY", user_xauth_path, 1);
 	snprintf(buf, PATH_MAX, "%s/.cache", pass->pw_dir);
-	mkdir(buf, 0600);
+	mkdir(buf, 0700);
 	setenv("XDG_CACHE_HOME", buf, 0);
 	snprintf(buf, PATH_MAX, "%s/.config", pass->pw_dir);
 	setenv("XDG_CONFIG_HOME", buf, 0);
