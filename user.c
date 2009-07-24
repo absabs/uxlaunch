@@ -29,7 +29,7 @@
 int uid;
 struct passwd *pass;
 
-static char user_xauth_path[PATH_MAX];
+char user_xauth_path[PATH_MAX];
 
 
 /*

@@ -13,6 +13,7 @@ extern char displaydev[];
 extern char displayname[];
 extern char xauth_cookie_file[];
 extern Xauth x_auth;
+extern char user_xauth_path[];
 
 extern int tty;
 extern char session[];
