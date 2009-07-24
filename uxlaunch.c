@@ -65,9 +65,10 @@ int main(int argc, char **argv)
 	 * so can happen while X is talking to the
 	 * hardware
 	 */
-	start_ssh_agent();
 
 	wait_for_X_signal();
+
+	start_ssh_agent();
 
 	setup_consolekit_session();
 

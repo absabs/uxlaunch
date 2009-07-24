@@ -227,7 +227,7 @@ void start_X_server(void)
 		execl(xserver, xserver,  displayname, "-nr", "-verbose", "-auth", xauth_cookie_file,
 		      "-nolisten", "tcp", "-dpi", "120", vt, NULL);
 	} else {
-		execl(xserver, xserver,  displayname, "-nr", "-verbose", "-auth", xauth_cookie_file,
+		execl(xserver, xserver,  displayname, "-nr", "-verbose", "-auth", user_xauth_path,
 		      "-nolisten", "tcp", "-dpi", "120", "-logfile", "/tmp/Xorg.0.log", "-nohwaccess", vt, NULL);
 	}
 	exit(0);
