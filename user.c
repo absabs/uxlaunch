@@ -111,8 +111,6 @@ void set_i18n(void)
 	FILE *f;
 	lprintf("entering set_i18n");
 
-	setenv("GTK_IM_MODULE", "scim-bridge", 0);
-	setenv("CLUTTER_IM_MODULE","scim-bridge", 0);
 
 	/*
 	 * /etc/sysconfig/i18n contains shell code that sets
@@ -143,8 +141,13 @@ void set_i18n(void)
 
 			/* grab the stuff we need, avoiding comments
 			 * and other user stuff we don't care for now */
-			if (!strcmp(key, "LANG"))
+			if (!strcmp(key, "LANG")) {
 				setenv(key, val, 1);
+				if (strstr(val, "zh_")) {
+					setenv("GTK_IM_MODULE", "scim-bridge", 0);
+					setenv("CLUTTER_IM_MODULE","scim-bridge", 0);
+				}
+			}
 			if (!strcmp(key, "SYSFONT"))
 				setenv(key, val, 1);
 		}
