@@ -84,6 +84,7 @@ void switch_to_user(void)
 	snprintf(buf, PATH_MAX, "%s/.config", pass->pw_dir);
 	setenv("XDG_CONFIG_HOME", buf, 0);
 	setenv("OOO_FORCE_DESKTOP","gnome", 0);
+	setenv("LIBC_FATAL_STDERR_", "1", 0);
 
 	set_i18n();
 
