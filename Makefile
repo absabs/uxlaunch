@@ -8,10 +8,10 @@ install: uxlaunch
 	mkdir -p $(DESTDIR)/usr/sbin \
 	         $(DESTDIR)/etc/sysconfig/ \
 	         $(DESTDIR)/usr/share/man/man1/
-	install uxlaunch $(DESTDIR)/usr/sbin/
+	install -m0755  uxlaunch $(DESTDIR)/usr/sbin/
 	[ -f $(DESTDIR)/etc/sysconfig/uxlaunch ] || \
-	    install uxlaunch.sysconfig $(DESTDIR)/etc/sysconfig/uxlaunch
-	install uxlaunch.1 $(DESTDIR)/usr/share/man/man1/uxlaunch.1
+	    install -m0644 uxlaunch.sysconfig $(DESTDIR)/etc/sysconfig/uxlaunch
+	install -m0644 uxlaunch.1 $(DESTDIR)/usr/share/man/man1/uxlaunch.1
 
 OBJS := uxlaunch.o consolekit.o dbus.o desktop.o misc.o pam.o user.o xserver.o \
 	lib.o options.o oom_adj.o
