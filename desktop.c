@@ -125,7 +125,7 @@ static void do_desktop_file(const char *filename)
 		c = strchr(line, '\n');
 		if (c) *c = 0;
 		if (strstr(line, "Exec="))
-			strncpy(exec, line+5, 4095);
+			strncpy(exec, g_shell_unquote(line+5, NULL), 4095);
 
 		if (strstr(line, "OnlyShowIn"))
 			if (strstr(line, session_filter) == NULL)
