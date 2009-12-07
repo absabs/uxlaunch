@@ -143,10 +143,10 @@ static void do_desktop_file(const char *filename)
 		if (strstr(line, "X-Moblin-Priority")) {
 			if (strstr(line, "Highest"))
 				prio = -1;
-			if (strstr(line, "High"))
+			else if (strstr(line, "High"))
 				prio = 0;
 			/* default: prio = 1 */
-			if (strstr(line, "Low"))
+			else if (strstr(line, "Low"))
 				prio = 2;
 
 		}
