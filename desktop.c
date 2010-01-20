@@ -149,6 +149,8 @@ static void do_desktop_file(const char *filename)
 			/* default: prio = 1 */
 			else if (strstr(line, "Low"))
 				prio = 2;
+			else if (strstr(line, "Late"))
+				prio = 3;
 
 		}
 	}
@@ -302,6 +304,8 @@ void do_autostart(void)
 		entry = item->data;
 
 		delay = delay + ((1 << (entry->prio + 1)) * DELAY_UNIT);
+		if (entry->prio >= 3)
+			delay += 120000000; /* 2 minutes delay */
 		lprintf("Queueing %s with prio %d at %d", entry->exec, entry->prio, delay);
 
 		if (fork()) {
