@@ -43,7 +43,7 @@ Xauth x_auth;
 static pthread_mutex_t notify_mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t notify_condition = PTHREAD_COND_INITIALIZER;
 
-static int xpid;
+int xpid;
 
 #define XAUTH_DIR "/var/run/uxlaunch"
 
@@ -181,6 +181,7 @@ void start_X_server(void)
 	char *xserver = NULL;
 	int ret;
 	char vt[80];
+	char xorg_log[PATH_MAX];
 	struct stat statbuf;  
 
 	/* Step 1: arm the signal */
@@ -192,6 +193,7 @@ void start_X_server(void)
 	ret = fork();
 	if (ret) {
 		xpid = ret;
+		lprintf("Started Xorg[%d]", xpid);
 		/* setup sighandler for main thread */
 		memset(&term, 0, sizeof(struct sigaction));
 		term.sa_handler = termhandler;
@@ -221,6 +223,8 @@ void start_X_server(void)
 
 	snprintf(vt, 80, "vt%d", tty);
 
+	snprintf(xorg_log, PATH_MAX, "/tmp/Xorg.0.%s.log", pass->pw_name);
+
 	/* Step 4: start the X server */
 	ret = stat(xserver, &statbuf);
 	if (!ret && (statbuf.st_mode & S_ISUID)) {
@@ -228,7 +232,7 @@ void start_X_server(void)
 		      "-nolisten", "tcp", "-dpi", "120", vt, NULL);
 	} else {
 		execl(xserver, xserver,  displayname, "-nr", "-verbose", "-auth", user_xauth_path,
-		      "-nolisten", "tcp", "-dpi", "120", "-logfile", "/tmp/Xorg.0.log", "-nohwaccess", vt, NULL);
+		      "-nolisten", "tcp", "-dpi", "120", "-logfile", xorg_log, vt, NULL);
 	}
 	exit(0);
 }
@@ -254,13 +258,31 @@ void wait_for_X_signal(void)
 void wait_for_X_exit(void)
 {	
 	int ret;
+	int status;
+
 	lprintf("wait_for_X_exit");
 	while (!exiting) {
-		ret = waitpid(0, NULL, 0);
-		if (ret == xpid)
+		ret = waitpid(-1, &status, 0);
+
+		if (WIFEXITED(status))
+			lprintf("process %d exited with exit code %d",
+				ret, WEXITSTATUS(status));
+		if (WIFSIGNALED(status))
+			lprintf("process %d was killed by signal %d",
+				ret, WTERMSIG(status));
+		if (WIFCONTINUED(status))
+			lprintf("process %d continued");
+
+		if (ret == xpid) {
+			lprintf("Xorg[%d] exited, cleaning up", ret);
 			break;
+		}
+		if (ret == session_pid) {
+			lprintf("Session process [%d] exited, cleaning up",
+				ret);
+			kill(xpid, SIGTERM);
+		}
 	}
-	lprintf("X exited");
 }
 
 void set_text_mode(void)

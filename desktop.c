@@ -20,6 +20,8 @@
 #include <dirent.h>
 #include <time.h>
 #include <glib.h>
+#include <limits.h>
+#include <pwd.h>
 
 #include "uxlaunch.h"
 #if defined(__i386__)
@@ -122,14 +124,14 @@ static void do_desktop_file(const char *filename)
 			break;
 		c = strchr(line, '\n');
 		if (c) *c = 0;
-		if (strstr(line, "Exec="))
-			strncpy(exec, line+5, 4095);
+		if (!strncmp(line, "Exec=", strlen("Exec=")))
+			strncpy(exec, g_shell_unquote(line+5, NULL), 4095);
 
-		if (strstr(line, "OnlyShowIn"))
+		if (!strncmp(line, "OnlyShowIn", strlen("OnlyShowIn")))
 			if (strstr(line, session_filter) == NULL)
 				show = 0;
 
-		if (strstr(line, "NotShowIn")) {
+		if (!strncmp(line, "NotShowIn", strlen("NotShowIn"))) {
 			if (strstr(line, session_filter))
 				show = 0;
 			/* for moblin, hide stuff hidden to gnome */
@@ -138,14 +140,17 @@ static void do_desktop_file(const char *filename)
 					show = 0;
 		}
 
-		if (strstr(line, "X-Moblin-Priority")) {
+		if (!strncmp(line, "X-Moblin-Priority",
+			     strlen("X-Moblin-Priority"))) {
 			if (strstr(line, "Highest"))
 				prio = -1;
-			if (strstr(line, "High"))
+			else if (strstr(line, "High"))
 				prio = 0;
 			/* default: prio = 1 */
-			if (strstr(line, "Low"))
+			else if (strstr(line, "Low"))
 				prio = 2;
+			else if (strstr(line, "Late"))
+				prio = 3;
 
 		}
 	}
@@ -156,27 +161,11 @@ static void do_desktop_file(const char *filename)
 }
 
 
-void autostart_panels(void)
-{
-
-	if (!strstr(session_filter, "MOBLIN"))
-		return;
-	if (!strstr(session, "mutter"))
-		return;
-
-	desktop_entry_add("/usr/libexec/moblin-panel-myzone", -1);
-	desktop_entry_add("/usr/libexec/moblin-panel-status", 0);
-	desktop_entry_add("/usr/libexec/moblin-panel-people", 0);
-	desktop_entry_add("/usr/libexec/moblin-panel-internet", 0);
-	desktop_entry_add("/usr/libexec/moblin-panel-media", 1);
-	desktop_entry_add("/usr/libexec/moblin-panel-pasteboard", 0);
-	desktop_entry_add("/usr/libexec/moblin-panel-applications", 1);
-}
-
-
 void get_session_type(void)
 {
 	/* adjust filter based on what our session cmd is */
+	if (strstr(session, "neskowin"))
+		snprintf(session_filter, 16, "MUX");
 	if (strstr(session, "xfce"))
 		snprintf(session_filter, 16, "XFCE");
 	if (strstr(session, "gnome"))
@@ -194,28 +183,68 @@ void autostart_desktop_files(void)
 {
 	DIR *dir;
 	struct dirent *entry;
+	char user_path[PATH_MAX];
+	char user_file[PATH_MAX];
 
 	lprintf("Entering autostart_desktop_files");
 
+	snprintf(user_path, PATH_MAX, "/home/%s/.config/autostart",
+		 pass->pw_name);
+
 	dir = opendir("/etc/xdg/autostart");
 	if (!dir) {
-		lprintf("Autostart directory not found");
-		return;
-	}
+		lprintf("System autostart directory not found");
+	} else {
+		while (1) {
+			char filename[PATH_MAX];
+			entry = readdir(dir);
+			if (!entry)
+				break;
+			if (entry->d_name[0] == '.')
+				continue;
+			if (entry->d_type != DT_REG)
+				continue;
+			if (strchr(entry->d_name, '~'))
+				continue;  /* editor backup file */
 
-	while (1) {
-		char filename[PATH_MAX];
-		entry = readdir(dir);
-		if (!entry)
-			break;
-		if (entry->d_name[0] == '.')
-			continue;
-		if (entry->d_type != DT_REG)
-			continue;
-		if (strchr(entry->d_name, '~'))
-			continue;  /* editor backup file */
-		snprintf(filename, 4096, "/etc/xdg/autostart/%s", entry->d_name);
-		do_desktop_file(filename);
+			/* 
+			 * filter - don't run this file if same-named
+			 * file exists in user_path
+			 */
+			snprintf(user_file, PATH_MAX, "%s/%s", user_path,
+				 entry->d_name);
+			if (!access(user_file, R_OK))
+				continue;
+	
+			snprintf(filename, PATH_MAX, "/etc/xdg/autostart/%s",
+				 entry->d_name);
+			do_desktop_file(filename);
+		}
+	}
+	closedir(dir);
+	
+	snprintf(user_path, PATH_MAX, "/home/%s/.config/autostart",
+		 pass->pw_name);
+	dir = opendir(user_path);
+	if (!dir) {
+		lprintf("User autostart directory not found");
+	} else {
+		while (1) {
+			char filename[PATH_MAX];
+			entry = readdir(dir);
+			if (!entry)
+				break;
+			if (entry->d_name[0] == '.')
+				continue;
+			if (entry->d_type != DT_REG)
+				continue;
+			if (strchr(entry->d_name, '~'))
+				continue;  /* editor backup file */
+			snprintf(filename, PATH_MAX, "%s/%s", user_path,
+				 entry->d_name);
+			do_desktop_file(filename);
+		}
+
 	}
 	closedir(dir);
 }
@@ -275,6 +304,8 @@ void do_autostart(void)
 		entry = item->data;
 
 		delay = delay + ((1 << (entry->prio + 1)) * DELAY_UNIT);
+		if (entry->prio >= 3)
+			delay += 120000000; /* 2 minutes delay */
 		lprintf("Queueing %s with prio %d at %d", entry->exec, entry->prio, delay);
 
 		if (fork()) {

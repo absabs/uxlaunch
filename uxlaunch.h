@@ -20,6 +20,7 @@ extern char session[];
 extern char username[];
 
 extern int session_pid;
+extern int xpid;
 
 extern int verbose;
 
@@ -40,13 +41,16 @@ extern void stop_ssh_agent(void);
 extern void start_gconf(void);
 extern void maybe_start_screensaver(void);
 extern void get_session_type(void);
-extern void autostart_panels(void);
 extern void autostart_desktop_files(void);
 extern void do_autostart(void);
 extern void start_desktop_session(void);
 extern void start_bash(void);
 extern void wait_for_X_exit(void);
 extern void set_text_mode(void);
+
+extern void oom_adj(int, int);
+extern void start_oom_task(void);
+extern void stop_oom_task(void);
 
 extern void open_log(void);
 extern void lprintf(const char *, ...);

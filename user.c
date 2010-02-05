@@ -74,7 +74,7 @@ void switch_to_user(void)
 	snprintf(buf, PATH_MAX, "/var/spool/mail/%s", pass->pw_name);
 	setenv("MAIL", buf, 1);
 	setenv("DISPLAY", displayname, 1);
-	snprintf(buf, PATH_MAX, "/usr/local/bin:/bin:/usr/bin:%s/bin", pass->pw_dir);
+	snprintf(buf, PATH_MAX, "/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:%s/bin", pass->pw_dir);
 	setenv("PATH", buf, 1);
 	snprintf(user_xauth_path, PATH_MAX, "%s/.Xauthority", pass->pw_dir);
 	setenv("XAUTHORITY", user_xauth_path, 1);
