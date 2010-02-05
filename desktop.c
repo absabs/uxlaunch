@@ -140,6 +140,20 @@ static void do_desktop_file(const char *filename)
 					show = 0;
 		}
 
+		c = strchr(line, '=');
+		if (c) {
+			c++;
+			while (*c == ' ') c++;
+			if (strstr(line, "X-Moblin-OnlyStartIfFileExists")) {
+				if (access(c, R_OK))
+					show = 0;
+			}
+			if (strstr(line, "X-Moblin-DontStartIfFileExists")) {
+				if (!access(c, R_OK))
+					show = 0;
+			}
+		}
+
 		if (!strncmp(line, "X-Moblin-Priority",
 			     strlen("X-Moblin-Priority"))) {
 			if (strstr(line, "Highest"))
