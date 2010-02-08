@@ -228,10 +228,10 @@ void start_X_server(void)
 	/* Step 4: start the X server */
 	ret = stat(xserver, &statbuf);
 	if (!ret && (statbuf.st_mode & S_ISUID)) {
-		execl(xserver, xserver,  displayname, "-nr", "-verbose", "-auth", xauth_cookie_file,
+		execl(xserver, xserver,  displayname, "-verbose", "-auth", xauth_cookie_file,
 		      "-nolisten", "tcp", "-dpi", "120", vt, NULL);
 	} else {
-		execl(xserver, xserver,  displayname, "-nr", "-verbose", "-auth", user_xauth_path,
+		execl(xserver, xserver,  displayname, "-verbose", "-auth", user_xauth_path,
 		      "-nolisten", "tcp", "-dpi", "120", "-logfile", xorg_log, vt, NULL);
 	}
 	exit(0);
