@@ -58,7 +58,16 @@ int main(int argc, char **argv)
 	setup_xauth();
 
 	switch_to_user();
-	
+
+	/*
+	 * BUG: udev is sometimes not done when we go and start Xorg,
+	 * which results in the mouse/kbd not working. To work around this
+	 * we call udevadm settle and force the system to wait for
+	 * device probing to complete, which may be a long time
+	 */
+	if (system("/sbin/udevadm settle --timeout 10") != EXIT_SUCCESS)
+		lprintf("udevadm settle bash returned an error");
+
 	start_X_server();
 
 	/*
