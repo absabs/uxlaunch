@@ -16,12 +16,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <pwd.h>
 
 #include "uxlaunch.h"
 
 
 int main(int argc, char **argv)
 {
+	char xhost_cmd[80];
+
 	open_log();
 
 	/*
@@ -91,6 +94,13 @@ int main(int argc, char **argv)
 	maybe_start_screensaver();
 
 	start_desktop_session();
+
+	/* finally, set local username to be allowed at any time,
+	 * which is not depenedent on hostname changes */
+	snprintf(xhost_cmd, 80, "/usr/bin/xhost +SI:localuser:%s",
+		 pass->pw_name);
+	if (system(xhost_cmd) != 0)
+		lprintf("%s failed", xhost_cmd);
 
 	get_session_type();
 	autostart_desktop_files();
