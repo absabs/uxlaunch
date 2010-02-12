@@ -48,14 +48,14 @@ static int delay = 0;
 #define DELAY_UNIT 50000
 
 struct desktop_entry_struct {
-	char *exec;
+	gchar *exec;
 	int prio;
 };
 
 static GList *desktop_entries;
 
 
-static void desktop_entry_add(const char *exec, int prio)
+static void desktop_entry_add(gchar *exec, int prio)
 {
 	GList *item;
 	struct desktop_entry_struct *entry;
@@ -107,71 +107,66 @@ gint sort_entries(gconstpointer a, gconstpointer b)
  */
 static void do_desktop_file(const char *filename)
 {
-	FILE *file;
-	char line[4096];
-	char exec[4096];
+
+	GKeyFile *keyfile;
+	GError *error = NULL;
+	gchar *exec_key;
+	gchar *onlyshowin_key;
+	gchar *notshowin_key;
+	gchar *prio_key;
+	gchar *onlystart_key;
+	gchar *dontstart_key;
+
 	int show = 1;
 	int prio = 1; /* medium/normal prio */
 
-	file = fopen(filename, "r");
-	if (!file)
+	lprintf("Parsing %s", filename);
+
+	keyfile = g_key_file_new();
+	if (!g_key_file_load_from_file(keyfile, filename, 0, &error)) {
+		g_error(error->message);
 		return;
-
-	memset(exec, 0, 4096);
-	while (!feof(file)) {
-		char *c;
-		if (fgets(line, 4096, file) == NULL)
-			break;
-		c = strchr(line, '\n');
-		if (c) *c = 0;
-		if (!strncmp(line, "Exec=", strlen("Exec=")))
-			strncpy(exec, g_shell_unquote(line+5, NULL), 4095);
-
-		if (!strncmp(line, "OnlyShowIn", strlen("OnlyShowIn")))
-			if (strstr(line, session_filter) == NULL)
-				show = 0;
-
-		if (!strncmp(line, "NotShowIn", strlen("NotShowIn"))) {
-			if (strstr(line, session_filter))
-				show = 0;
-			/* for moblin, hide stuff hidden to gnome */
-			if (!strcmp(session_filter, "MOBLIN"))
-				if (strstr(line, "GNOME"))
-					show = 0;
-		}
-
-		c = strchr(line, '=');
-		if (c) {
-			c++;
-			while (*c == ' ') c++;
-			if (strstr(line, "X-Moblin-OnlyStartIfFileExists")) {
-				if (access(c, R_OK))
-					show = 0;
-			}
-			if (strstr(line, "X-Moblin-DontStartIfFileExists")) {
-				if (!access(c, R_OK))
-					show = 0;
-			}
-		}
-
-		if (!strncmp(line, "X-Moblin-Priority",
-			     strlen("X-Moblin-Priority"))) {
-			if (strstr(line, "Highest"))
-				prio = -1;
-			else if (strstr(line, "High"))
-				prio = 0;
-			/* default: prio = 1 */
-			else if (strstr(line, "Low"))
-				prio = 2;
-			else if (strstr(line, "Late"))
-				prio = 3;
-
-		}
 	}
-	fclose(file);
 
-	if (show && strlen(exec)>0)
-		desktop_entry_add(exec, prio);
+	exec_key = g_key_file_get_string(keyfile, "Desktop Entry", "Exec", NULL);
+	if (!exec_key)
+		return;
+	onlyshowin_key = g_key_file_get_string(keyfile, "Desktop Entry", "OnlyShowIn", NULL);
+	notshowin_key = g_key_file_get_string(keyfile, "Desktop Entry", "NotShowIn", NULL);
+	prio_key = g_key_file_get_string(keyfile, "Desktop Entry", "X-Moblin-Priority", NULL);
+	onlystart_key = g_key_file_get_string(keyfile, "Desktop Entry", "X-Moblin-OnlyStartIfFileExists", NULL);
+	dontstart_key = g_key_file_get_string(keyfile, "Desktop Entry", "X-Moblin-DontStartIfFileExists", NULL);
+
+	if (onlyshowin_key)
+		if (!g_strstr_len(onlyshowin_key, -1, session_filter))
+			show = 0;
+	if (notshowin_key) {
+		if (g_strstr_len(notshowin_key, -1, session_filter))
+			show = 0;
+		/* for moblin, hide stuff hidden to gnome */
+		if (!strcmp(session_filter, "MOBLIN"))
+			if (g_strstr_len(notshowin_key, -1, "GNOME"))
+				show = 0;
+	}
+	if (onlystart_key)
+		if (access(onlystart_key, R_OK))
+			show = 0;
+	if (dontstart_key)
+		if (!access(dontstart_key, R_OK))
+			show = 0;
+	if (prio_key) {
+		if (g_strstr_len(prio_key, -1, "Highest"))
+			prio = -1;
+		else if (g_strstr_len(prio_key, -1, "High"))
+			prio = 0;
+		else if (g_strstr_len(prio_key, -1, "Low"))
+			prio = 2;
+		else if (g_strstr_len(prio_key, -1, "Late"))
+			prio = 3;
+	}
+
+	if (show)
+		desktop_entry_add(g_shell_unquote(exec_key, &error), prio);
 }
 
 
@@ -188,6 +183,7 @@ void get_session_type(void)
 		snprintf(session_filter, 16, "KDE");
 	/* default == MOBLIN */
 }
+
 
 /*
  * We need to process all the .desktop files in /etc/xdg/autostart.
