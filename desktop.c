@@ -368,7 +368,7 @@ void start_desktop_session(void)
 	ptrs[0] = strtok(session, " \t");
 	while (ptrs[count] && count < 255)
 		ptrs[++count] = strtok(NULL, " \t");
-	
+
 	ret = execv(ptrs[0], ptrs);
 
 	if (ret != EXIT_SUCCESS)
