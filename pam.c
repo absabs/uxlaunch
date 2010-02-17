@@ -2,7 +2,7 @@
  * This file is part of uxlaunch
  *
  * (C) Copyright 2009 Intel Corporation
- * Authors: 
+ * Authors:
  *     Auke Kok <auke@linux.intel.com>
  *     Arjan van de Ven <arjan@linux.intel.com>
  *
@@ -28,7 +28,7 @@ struct pam_conv pc;
  * Creating a PAM session. We need a pam "login" session so that the dbus
  * "at_console" logic will work correctly, as well as various /dev file
  * permissions.
- * 
+ *
  * for pam_console to work we need to set the PAM_TTY and PAM_XDISPLAY variables,
  * before we open the session. "PAM_TTY" takes input in the form "ttyX", without
  * the /dev prefix, so we need to construct that in place here.

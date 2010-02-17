@@ -2,7 +2,7 @@
  * This file is part of uxlaunch
  *
  * (C) Copyright 2009 Intel Corporation
- * Authors: 
+ * Authors:
  *     Auke Kok <auke@linux.intel.com>
  *     Arjan van de Ven <arjan@linux.intel.com>
  *
@@ -182,7 +182,7 @@ void start_X_server(void)
 	int ret;
 	char vt[80];
 	char xorg_log[PATH_MAX];
-	struct stat statbuf;  
+	struct stat statbuf;
 
 	/* Step 1: arm the signal */
 	memset(&usr1, 0, sizeof(struct sigaction));
@@ -256,7 +256,7 @@ void wait_for_X_signal(void)
 }
 
 void wait_for_X_exit(void)
-{	
+{
 	int ret;
 	int status;
 

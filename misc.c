@@ -106,8 +106,8 @@ void start_gconf(void)
 /*
  * Start the background screensaver daemon.
  * Also, if /etc/sysconfig/lock-screen exists,
- * start with the screen locked. 
- * 
+ * start with the screen locked.
+ *
  * We do this instead of using a login screen, for the
  * cases that people want a password on their device.
  */
@@ -116,7 +116,7 @@ void maybe_start_screensaver(void)
 	int ret;
 
 	/* the screensaver becomes a daemon */
-	ret = system("/usr/bin/gnome-screensaver"); 
+	ret = system("/usr/bin/gnome-screensaver");
 	if (!ret)
 		lprintf("Failed to launch /usr/bin/gnome-screensaver");
 
@@ -126,4 +126,3 @@ void maybe_start_screensaver(void)
 			lprintf("Failed to launch /usr/bin/gnome-screensaver-command");
 	}
 }
-

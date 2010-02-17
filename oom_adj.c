@@ -2,7 +2,7 @@
  * This file is part of uxlaunch
  *
  * (C) Copyright 2009 Intel Corporation
- * Authors: 
+ * Authors:
  *     Auke Kok <auke@linux.intel.com>
  *     Arjan van de Ven <arjan@linux.intel.com>
  *
@@ -51,7 +51,7 @@ void start_oom_task()
 		lprintf("Failed to fork oom_adj task");
 		exit(EXIT_FAILURE);
 	}
-	
+
 	if (pid != 0) {
 		close(oom_pipe[0]);
 		return;
@@ -77,7 +77,7 @@ void start_oom_task()
 			lprintf("Failed to write oom_adj value: %s: %d", path,
 				request.prio);
 		close(fd);
-			
+
 	}
 
 	/* close pipe and exit */
@@ -104,5 +104,3 @@ void oom_adj(int pid, int prio)
 		lprintf("Error: unable to write to oom_adj pipe: pid [%d] "
 			"prio %d", pid, prio);
 }
-	
-

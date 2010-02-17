@@ -2,7 +2,7 @@
  * This file is part of uxlaunch
  *
  * (C) Copyright 2009 Intel Corporation
- * Authors: 
+ * Authors:
  *     Auke Kok <auke@linux.intel.com>
  *     Arjan van de Ven <arjan@linux.intel.com>
  *
@@ -217,7 +217,7 @@ void autostart_desktop_files(void)
 			if (strchr(entry->d_name, '~'))
 				continue;  /* editor backup file */
 
-			/* 
+			/*
 			 * filter - don't run this file if same-named
 			 * file exists in user_path
 			 */
@@ -225,14 +225,14 @@ void autostart_desktop_files(void)
 				 entry->d_name);
 			if (!access(user_file, R_OK))
 				continue;
-	
+
 			snprintf(filename, PATH_MAX, "/etc/xdg/autostart/%s",
 				 entry->d_name);
 			do_desktop_file(filename);
 		}
 	}
 	closedir(dir);
-	
+
 	snprintf(user_path, PATH_MAX, "/home/%s/.config/autostart",
 		 pass->pw_name);
 	dir = opendir(user_path);
@@ -374,4 +374,3 @@ void start_desktop_session(void)
 	if (ret != EXIT_SUCCESS)
 		lprintf("Failed to start %s", session);
 }
-

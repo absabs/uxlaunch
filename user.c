@@ -2,7 +2,7 @@
  * This file is part of uxlaunch
  *
  * (C) Copyright 2009 Intel Corporation
- * Authors: 
+ * Authors:
  *     Auke Kok <auke@linux.intel.com>
  *     Arjan van de Ven <arjan@linux.intel.com>
  *
@@ -59,28 +59,28 @@ static void do_env(void)
 	setenv("XDG_CONFIG_HOME", buf, 0);
 	setenv("OOO_FORCE_DESKTOP","gnome", 0);
 	setenv("LIBC_FATAL_STDERR_", "1", 0);
-	
+
 	file = popen("/bin/bash -l -c export", "r");
 	if (!file)
 		return;
-		
+
 	while (!feof(file)) {
 		char *c;
 		memset(buf, 0, sizeof(buf));
 		if (fgets(buf, sizeof(buf) - 1, file) == NULL)
 				break;
 		c = strchr(buf, '\n');
-		
+
 		if (strlen(buf) < 12)
 			continue;
-		if (c) 
+		if (c)
 			*c = 0;
-			
+
 		if (strstr(buf, "PWD"))
 			continue;
 //		if (strstr(buf, "DISPLAY"))
 //			continue;
-			
+
 		c = strchr(buf, '=');
 		if (c) {
 			char *c2;
@@ -93,9 +93,9 @@ static void do_env(void)
 			lprintf("Setting %s to %s\n", &buf[11], c);
 			setenv(&buf[11], c, 1);
 		}
-		
+
 	}
-		
+
 	pclose(file);
 }
 

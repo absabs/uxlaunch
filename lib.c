@@ -2,7 +2,7 @@
  * This file is part of uxlaunch
  *
  * (C) Copyright 2009 Intel Corporation
- * Authors: 
+ * Authors:
  *     Auke Kok <auke@linux.intel.com>
  *     Arjan van de Ven <arjan@linux.intel.com>
  *
@@ -61,7 +61,7 @@ void lprintf(const char* fmt, ...)
 	gettimeofday(&current, NULL);
 
 	secs = current.tv_sec - start.tv_sec;
-	
+
 	while (current.tv_usec < start.tv_usec) {
 		secs --;
 		current.tv_usec += 1000000;
@@ -98,7 +98,7 @@ void log_environment(void)
 	char **env;
 
 	env = environ;
-	
+
 	lprintf("--- environment variable dump:");
 	while (*env) {
 		lprintf("    %s", *env);
@@ -106,4 +106,3 @@ void log_environment(void)
 	}
 	lprintf("---");
 }
-
