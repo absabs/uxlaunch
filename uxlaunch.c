@@ -52,13 +52,16 @@ int main(int argc, char **argv)
 	 */
 
 	get_options(argc, argv);
+
+	setup_xauth();
+
+	setup_efs();
+
 	set_tty();
 
 	start_oom_task();
 
 	setup_pam_session();
-
-	setup_xauth();
 
 	switch_to_user();
 

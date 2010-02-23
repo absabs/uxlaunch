@@ -89,6 +89,7 @@ void start_bash(void)
 		lprintf("bash returned an error");
 }
 
+
 /*
  * We want to start gconf early, by hand, so that it can start processing the
  * XML well before someone needs it to cut down the total time
@@ -99,7 +100,24 @@ void start_gconf(void)
 
 	ret = system("gconftool-2 --spawn");
 	if (ret)
-		lprintf("failure to start gconftool-2: %d", ret);
+		lprintf("failed to start gconftool-2: %d", ret);
+}
+
+
+void init_screensaver(int lock_now)
+{
+	int ret;
+ 
+	/* the screensaver becomes a daemon */
+	ret = system("/usr/bin/gnome-screensaver"); 
+	if (ret)
+		lprintf("failed to launch /usr/bin/gnome-screensaver");
+ 
+	if (lock_now) {
+		ret = system("/usr/bin/gnome-screensaver-command --lock");
+		if (ret)
+			lprintf("failed to launch /usr/bin/gnome-screensaver-command --lock");
+	}
 }
 
 
@@ -113,16 +131,11 @@ void start_gconf(void)
  */
 void maybe_start_screensaver(void)
 {
-	int ret;
-
-	/* the screensaver becomes a daemon */
-	ret = system("/usr/bin/gnome-screensaver");
-	if (!ret)
-		lprintf("Failed to launch /usr/bin/gnome-screensaver");
-
 	if (!access("/etc/sysconfig/lock-screen", R_OK)) {
-		ret = system("/usr/bin/gnome-screensaver-command --lock");
-		if (!ret)
-			lprintf("Failed to launch /usr/bin/gnome-screensaver-command");
+		init_screensaver(1);
+	} else {
+		init_screensaver(0);
 	}
 }
+
+

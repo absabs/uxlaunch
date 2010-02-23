@@ -2,7 +2,8 @@
 #define __INCLUDE_GUARD_UXLAUNCH_
 
 #include <X11/Xauth.h>
-
+#include <sys/types.h>
+#include <pwd.h>
 
 /*
  * Target user information
@@ -39,6 +40,7 @@ extern void setup_consolekit_session(void);
 extern void start_ssh_agent(void);
 extern void stop_ssh_agent(void);
 extern void start_gconf(void);
+extern void init_screensaver(int);
 extern void maybe_start_screensaver(void);
 extern void get_session_type(void);
 extern void autostart_desktop_files(void);
@@ -57,6 +59,8 @@ extern void lprintf(const char *, ...);
 extern void log_environment(void);
 
 extern void close_log(void);
+
+extern void setup_efs(void);
 
 #define NORMAL 0
 #define NICE 1
