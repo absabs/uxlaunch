@@ -20,6 +20,7 @@
 #include <unistd.h>
 #include "uxlaunch.h"
 
+
 static int ecryptfs_automount_set()
 {
 	const char *homedir = pass->pw_dir;
@@ -30,17 +31,19 @@ static int ecryptfs_automount_set()
 		lprintf("Error: EFS: %s asprintf failed", __func__);
 		return 0;
 	}
-	if (access(file_path, F_OK)) {
-		if (errno != ENOENT) {
-			lprintf("Error: EFS: access() failed when checking auto-mount file, errno: %d", errno);
-			goto out;
-		}
+	if (access(file_path, F_OK) == 0) {
+		/* ecryptfs detected, need to mount */
+		free(file_path);
+		return -1;
 	}
-	rc = 1;
-out:
+	if (errno != ENOENT) {
+		lprintf("Error: EFS: access() failed when checking auto-mount file, errno: %d", errno);
+	}
 	free(file_path);
-	return rc;
+	/* no ecryptfs automount hint found */
+	return 0;
 }
+
 
 static int grep(const char *filename, const char *pattern)
 {
@@ -65,6 +68,7 @@ out:
 	return ret;
 }
 
+
 /*
  * Check if the homedir is already mounted
  */
@@ -80,6 +84,7 @@ static int ecryptfs_mounted()
 	return grep("/proc/mounts", search_pattern) == 0;
 }
 
+
 static void start_greeter (void)
 {
 	int ret;
@@ -91,6 +96,7 @@ static void start_greeter (void)
 		lprintf("Failed on /usr/bin/gnome-screensaver-command --wait, rc: %d", ret);
 }
 
+
 void setup_efs(void)
 {
 	int ret;
@@ -100,6 +106,7 @@ void setup_efs(void)
 	/* we need to be fast, do nothing unless absolutely needed */
 	if (!ecryptfs_automount_set())
 		return;
+
 	/* do nothing if it's alreay mounted */
 	if (ecryptfs_mounted()) {
 		lprintf("EFS is already mounted, do nothing");
