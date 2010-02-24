@@ -24,7 +24,6 @@
 static int ecryptfs_automount_set()
 {
 	const char *homedir = pass->pw_dir;
-	int rc = 0;
 	char *file_path;
 
 	if (asprintf(&file_path, "%s/.ecryptfs/auto-mount", homedir) < 0) {
