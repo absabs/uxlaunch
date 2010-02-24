@@ -2,7 +2,7 @@
  * This file is part of uxlaunch
  *
  * (C) Copyright 2009, 2010 Intel Corporation
- * Authors: 
+ * Authors:
  *     Yan Li <yan.i.li@intel.com>
  *
  * This program is free software; you can redistribute it and/or
@@ -62,7 +62,7 @@ static int grep(const char *filename, const char *pattern)
 out:
 	free(buf);
 	fclose(f);
-	return ret;	
+	return ret;
 }
 
 /*
@@ -72,7 +72,7 @@ static int ecryptfs_mounted()
 {
 	char *search_pattern;
 
-	if (asprintf(&search_pattern, " %s ecryptfs ", pass->pw_dir)) {
+	if (asprintf(&search_pattern, " %s ecryptfs ", pass->pw_dir) < 0) {
 		lprintf("Error: EFS: %s asprintf failed", __func__);
 		return 0;
 	}
@@ -136,7 +136,7 @@ void setup_efs(void)
 		lprintf("EFS: authentication success");
 		exit(0);
 	}
-	
+
 	/* parent */
 	if ((pid = waitpid(pid, &ret, 0)) < 0) {
 		lprintf("Error: EFS: setup_efs waitpid error");
