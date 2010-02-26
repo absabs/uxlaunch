@@ -229,12 +229,12 @@ void start_X_server(void)
 	ret = stat(xserver, &statbuf);
 	if (!ret && (statbuf.st_mode & S_ISUID)) {
 		execl(xserver, xserver,  displayname,
-		      "-nolisten", "tcp", "-dpi", "120",
+		      "-nolisten", "tcp", "-dpi", "120", "-noreset",
 		      "-auth", xauth_cookie_file,
 		      vt, NULL);
 	} else {
 		execl(xserver, xserver,  displayname,
-		      "-nolisten", "tcp", "-dpi", "120",
+		      "-nolisten", "tcp", "-dpi", "120", "-noreset",
 		      "-auth", user_xauth_path,
 		      "-logfile", xorg_log,
 		      vt, NULL);
