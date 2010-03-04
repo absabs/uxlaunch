@@ -22,6 +22,7 @@
 #include <glib.h>
 #include <limits.h>
 #include <pwd.h>
+#include <wordexp.h>
 
 #include "uxlaunch.h"
 #if defined(__i386__)
@@ -54,6 +55,36 @@ struct desktop_entry_struct {
 
 static GList *desktop_entries;
 
+
+/*
+ * Test whether a file exists, expanding ~ and $HOME in the string
+ */
+static int file_expand_exists(const char *path)
+{
+	wordexp_t p;
+	char **w;
+
+	/* don't expand backticks and shell calls like $(foo) */
+	wordexp(path, &p, WRDE_NOCMD | WRDE_UNDEF);
+	w = p.we_wordv;
+	if (p.we_wordc > 1) {
+		/* expansion found multiple files - so the file exists */
+		wordfree(&p);
+		return -1;
+	}
+
+	/*
+	 * expansion may have succeeded, or not, so we need to explicitly
+	 * check if the file exists now
+	 */
+	if (access(w[0], F_OK)) {
+		wordfree(&p);
+		return -1;
+	}
+
+	wordfree(&p);
+	return 0;
+}
 
 static void desktop_entry_add(gchar *exec, int prio)
 {
@@ -149,10 +180,10 @@ static void do_desktop_file(const char *filename)
 				show = 0;
 	}
 	if (onlystart_key)
-		if (access(onlystart_key, R_OK))
+		if (file_expand_exists(onlystart_key))
 			show = 0;
 	if (dontstart_key)
-		if (!access(dontstart_key, R_OK))
+		if (!file_expand_exists(dontstart_key))
 			show = 0;
 	if (prio_key) {
 		if (g_strstr_len(prio_key, -1, "Highest"))
