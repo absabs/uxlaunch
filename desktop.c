@@ -180,10 +180,10 @@ static void do_desktop_file(const char *filename)
 				show = 0;
 	}
 	if (onlystart_key)
-		if (file_expand_exists(onlystart_key))
+		if (!file_expand_exists(onlystart_key))
 			show = 0;
 	if (dontstart_key)
-		if (!file_expand_exists(dontstart_key))
+		if (file_expand_exists(dontstart_key))
 			show = 0;
 	if (prio_key) {
 		if (g_strstr_len(prio_key, -1, "Highest"))
