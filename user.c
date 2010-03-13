@@ -34,36 +34,10 @@ struct passwd *pass;
 
 char user_xauth_path[PATH_MAX];
 
-
-/*
- * Change from root (as we started) to the target user.
- * Steps
- * 1) setuid/getgid
- * 2) env variables: HOME, MAIL, LOGNAME, USER, SHELL, DISPLAY and PATH
- * 3) chdir(/home/foo);
- */
-void switch_to_user(void)
+static void do_env(void)
 {
 	char buf[PATH_MAX];
-	int result;
-	FILE *fp;
-	char fn[PATH_MAX];
-	int ret;
-
-	lprintf("Entering switch_to_user");
-
-	initgroups(pass->pw_name, pass->pw_gid);
-
-	/* make sure that the user owns /dev/ttyX */
-	ret = chown(displaydev, pass->pw_uid, pass->pw_gid);
-	if (ret)
-		lprintf("Failed to fix /dev/tty permission");
-
-	if (!((setgid(pass->pw_gid) == 0) && (setuid(pass->pw_uid) == 0)))
-		exit(EXIT_FAILURE);
-
-	setsid();
-
+	FILE *file;
 	/* start with a clean environ */
 	clearenv();
 
@@ -85,6 +59,76 @@ void switch_to_user(void)
 	setenv("XDG_CONFIG_HOME", buf, 0);
 	setenv("OOO_FORCE_DESKTOP","gnome", 0);
 	setenv("LIBC_FATAL_STDERR_", "1", 0);
+	
+	file = popen("/bin/bash -l -c export", "r");
+	if (!file)
+		return;
+		
+	while (!feof(file)) {
+		char *c;
+		memset(buf, 0, sizeof(buf));
+		if (fgets(buf, sizeof(buf) - 1, file) == NULL)
+				break;
+		c = strchr(buf, '\n');
+		
+		if (strlen(buf) < 12)
+			continue;
+		if (c) 
+			*c = 0;
+			
+		if (strstr(buf, "PWD"))
+			continue;
+//		if (strstr(buf, "DISPLAY"))
+//			continue;
+			
+		c = strchr(buf, '=');
+		if (c) {
+			char *c2;
+			*c = 0;
+			c++;
+			if (*c == '"') c++;
+			c2 = strchr(c, '"');
+			if (c2)
+				*c2 = 0;
+			lprintf("Setting %s to %s\n", &buf[11], c);
+			setenv(&buf[11], c, 1);
+		}
+		
+	}
+		
+	pclose(file);
+}
+
+
+/*
+ * Change from root (as we started) to the target user.
+ * Steps
+ * 1) setuid/getgid
+ * 2) env variables: HOME, MAIL, LOGNAME, USER, SHELL, DISPLAY and PATH
+ * 3) chdir(/home/foo);
+ */
+void switch_to_user(void)
+{
+	int result;
+	FILE *fp;
+	char fn[PATH_MAX];
+	int ret;
+
+	lprintf("Entering switch_to_user");
+
+	initgroups(pass->pw_name, pass->pw_gid);
+
+	/* make sure that the user owns /dev/ttyX */
+	ret = chown(displaydev, pass->pw_uid, pass->pw_gid);
+	if (ret)
+		lprintf("Failed to fix /dev/tty permission");
+
+	if (!((setgid(pass->pw_gid) == 0) && (setuid(pass->pw_uid) == 0)))
+		exit(EXIT_FAILURE);
+
+	setsid();
+
+	do_env();
 
 	set_i18n();
 
