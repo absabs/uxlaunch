@@ -29,6 +29,8 @@
 #  define __NR_ioprio_set 289
 #elif defined(__x86_64__)
 #  define __NR_ioprio_set 251
+#elif defined(__arm__)
+#  define __NR_ioprio_set 314
 #else
 #  error "Unsupported arch"
 #endif
