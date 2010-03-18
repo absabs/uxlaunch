@@ -343,12 +343,19 @@ void do_autostart(void)
 		char *ptrs[256];
 		int count = 0;
 		int ret = 0;
+		int late = 0;
 
 		entry = item->data;
 
-		delay = delay + ((1 << (entry->prio + 1)) * DELAY_UNIT);
-		if (entry->prio >= 3)
-			delay += 120000000; /* 2 minutes delay */
+		if (entry->prio >= 3) {
+			if (!late) {
+				delay += 60000000; /* start with a minute */
+				late = 1;
+			}
+			delay += 15000000; /* 15 seconds in between */
+		} else {
+			delay += ((1 << (entry->prio + 1)) * DELAY_UNIT);
+		}
 		lprintf("Queueing %s with prio %d at %d", entry->exec, entry->prio, delay);
 
 		if (fork()) {
