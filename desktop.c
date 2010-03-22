@@ -79,7 +79,7 @@ static int file_expand_exists(const char *path)
 	 * expansion may have succeeded, or not, so we need to explicitly
 	 * check if the file exists now
 	 */
-	if (access(w[0], F_OK)) {
+	if (!access(w[0], F_OK)) {
 		wordfree(&p);
 		return -1;
 	}
