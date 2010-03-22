@@ -131,7 +131,10 @@ void init_screensaver(int lock_now)
  */
 void maybe_start_screensaver(void)
 {
-	if (!access("/etc/sysconfig/lock-screen", R_OK)) {
+	char home_path[4097];
+	sprintf(home_path, "%s/.config/lock-screen", pass->pw_dir);
+	if (!access("/etc/sysconfig/lock-screen", R_OK) ||
+	    !access(home_path, R_OK)) {
 		init_screensaver(1);
 	} else {
 		init_screensaver(0);
