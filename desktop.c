@@ -206,8 +206,14 @@ static void do_desktop_file(const char *filename)
 void get_session_type(void)
 {
 	/* adjust filter based on what our session cmd is */
+	//FIXME: this needs to be mapped by xsession desktop files
+	//FIXME: in the same way the gnome session is defined
+	if (strstr(session, "duicompositor"))
+		snprintf(session_filter, 16, "X-DUI");
+	if (strstr(session, "ivi"))
+		snprintf(session_filter, 16, "X-IVI");
 	if (strstr(session, "neskowin"))
-		snprintf(session_filter, 16, "MUX");
+		snprintf(session_filter, 16, "X-MUX");
 	if (strstr(session, "xfce"))
 		snprintf(session_filter, 16, "XFCE");
 	if (strstr(session, "gnome"))
