@@ -108,15 +108,19 @@ void init_screensaver(int lock_now)
 {
 	int ret;
  
-	/* the screensaver becomes a daemon */
-	ret = system("/usr/bin/gnome-screensaver"); 
-	if (ret)
-		lprintf("failed to launch /usr/bin/gnome-screensaver");
  
 	if (lock_now) {
+		ret = system("/usr/bin/gnome-screensaver"); 
+		if (ret)
+			lprintf("failed to launch /usr/bin/gnome-screensaver");
 		ret = system("/usr/bin/gnome-screensaver-command --lock");
 		if (ret)
 			lprintf("failed to launch /usr/bin/gnome-screensaver-command --lock");
+	} else {
+		/* the screensaver becomes a daemon .. but we don't need it right away */
+		ret = system("/usr/bin/gnome-screensaver &"); 
+		if (ret)
+			lprintf("failed to launch /usr/bin/gnome-screensaver");
 	}
 }
 
