@@ -100,7 +100,6 @@ void setup_efs(void)
 {
 	int ret;
 	pid_t pid;
-	char cmd[255];
 
 	/* we need to be fast, do nothing unless absolutely needed */
 	if (!ecryptfs_automount_set())
@@ -130,16 +129,18 @@ void setup_efs(void)
 		switch_to_user();
 		start_X_server();
 		wait_for_X_signal();
+
 		/* start dbus session */
 		start_dbus_session_bus();
 		start_greeter();
-		/* kill everything */
-		snprintf(cmd, 254, "pkill -U %s", pass->pw_name);
-		ret = system(cmd);
-		if (0 != ret)
-			lprintf("Error: EFS: setup_efs failed to kill auth processes");
 
 		lprintf("EFS: authentication success");
+
+		/* kill Xorg, clean up */
+		kill(xpid, SIGTERM);
+		wait_for_X_exit();
+		stop_dbus_session_bus();
+
 		exit(0);
 	}
 
