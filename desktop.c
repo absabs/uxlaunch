@@ -301,6 +301,8 @@ void autostart_desktop_files(void)
 
 void start_xinitrc_scripts(void)
 {
+	// FIXME: feature removal: this entire mechanism needs to be
+	// removed in favor of desktop file handling
 	DIR* dir;
 
 	dir = opendir("/etc/X11/xinit/xinitrc.d");
