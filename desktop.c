@@ -299,7 +299,7 @@ void autostart_desktop_files(void)
 }
 
 
-void start_xinitrd_scripts(void)
+void start_xinitrc_scripts(void)
 {
 	DIR* dir;
 
@@ -355,7 +355,10 @@ void do_autostart(void)
 
 		if (entry->prio >= 3) {
 			if (!late) {
-				delay += 60000000; /* start with a minute */
+				/* handle xinitrc stuff now */
+				start_xinitrc_scripts();
+				/* then add late stuff */
+				delay += 60000000;
 				late = 1;
 			}
 			delay += 15000000; /* 15 seconds in between */
@@ -385,8 +388,6 @@ void do_autostart(void)
 		execvp(ptrs[0], ptrs);
 		exit(ret);
 	}
-
-	start_xinitrd_scripts();
 }
 
 
