@@ -176,7 +176,7 @@ static void do_desktop_file(const char *filename)
 	if (notshowin_key) {
 		if (g_strstr_len(notshowin_key, -1, session_filter))
 			show = 0;
-		/* for moblin, hide stuff hidden to gnome */
+		/* for MeeGo, hide stuff hidden to gnome */
 		if (!strcmp(session_filter, "MOBLIN"))
 			if (g_strstr_len(notshowin_key, -1, "GNOME"))
 				show = 0;

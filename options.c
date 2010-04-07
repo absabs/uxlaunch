@@ -26,7 +26,7 @@
 /* builtin defaults */
 int tty = 2;
 char session[256] = "/usr/bin/mutter --sm-disable";
-char username[256] = "moblin";
+char username[256] = "meego";
 
 int verbose = 0;
 

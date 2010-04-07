@@ -1,5 +1,5 @@
 /*
- * uxlaunch.c: Moblin starter
+ * uxlaunch.c: desktop session starter
  *
  * (C) Copyright 2009 Intel Corporation
  * Authors:

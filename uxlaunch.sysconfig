@@ -8,11 +8,11 @@
 # except in values where they are needed.
 #
 # defaults:
-# user=moblin
+# user=meego
 # tty=2
 # session=/usr/bin/mutter --sm-disable
 #
-# standard MOBLIN desktop:
+# standard MeeGo desktop:
 # session=/usr/bin/mutter --sm-disable
 #
 # GNOME desktop:
