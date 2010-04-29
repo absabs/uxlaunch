@@ -151,6 +151,8 @@ void switch_to_user(void)
 	}
 }
 
+static char *scim_languages[] = { "zh_", "ja_", "ko_", "lo_", "th_" };
+
 void set_i18n(void)
 {
 	FILE *f;
@@ -187,10 +189,13 @@ void set_i18n(void)
 			/* grab the stuff we need, avoiding comments
 			 * and other user stuff we don't care for now */
 			if (!strcmp(key, "LANG")) {
+				unsigned int i;
 				setenv(key, val, 1);
-				if (strstr(val, "zh_")) {
-					setenv("GTK_IM_MODULE", "scim-bridge", 0);
-					setenv("CLUTTER_IM_MODULE","scim-bridge", 0);
+				for (i = 0; i < sizeof(scim_languages) / sizeof(scim_languages[0]); i++) {
+					if (strstr(val, scim_languages[i])) {
+						setenv("GTK_IM_MODULE", "scim-bridge", 0);
+						setenv("CLUTTER_IM_MODULE","scim-bridge", 0);
+					}
 				}
 			}
 			if (!strcmp(key, "SYSFONT"))
