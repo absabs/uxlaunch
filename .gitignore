@@ -1,3 +1,5 @@
 *.o
 uxlaunch
 *~
+cscope.*
+tags
