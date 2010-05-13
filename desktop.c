@@ -17,12 +17,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
-#include <dirent.h>
+#include <errno.h>
+/*#include <dirent.h>
 #include <time.h>
 #include <glib.h>
 #include <limits.h>
 #include <pwd.h>
-#include <wordexp.h>
+#include <wordexp.h>*/
 
 #include "uxlaunch.h"
 #if defined(__i386__)
@@ -41,6 +42,7 @@
 
 
 int session_pid;
+#if 0
 char session_filter[16] = "MOBLIN";
 static int delay = 0;
 
@@ -391,7 +393,7 @@ void do_autostart(void)
 		exit(ret);
 	}
 }
-
+#endif
 
 void start_desktop_session(void)
 {
@@ -408,9 +410,9 @@ void start_desktop_session(void)
 
 	lprintf("Entering start_desktop_session");
 
-	ret = system("/usr/bin/xdg-user-dirs-update");
-	if (ret)
-		lprintf("/usr/bin/xdg-user-dirs-update failed");
+//	ret = system("/usr/bin/xdg-user-dirs-update");
+//	if (ret)
+//		lprintf("/usr/bin/xdg-user-dirs-update failed");
 
 	memset(ptrs, 0, sizeof(ptrs));
 
@@ -421,5 +423,5 @@ void start_desktop_session(void)
 	ret = execv(ptrs[0], ptrs);
 
 	if (ret != EXIT_SUCCESS)
-		lprintf("Failed to start %s", session);
+		lprintf("Failed to start %s: %s", session, strerror(errno));
 }

@@ -23,7 +23,7 @@
 
 int main(int argc, char **argv)
 {
-	char xhost_cmd[80];
+//	char xhost_cmd[80];
 
 	open_log();
 
@@ -55,13 +55,13 @@ int main(int argc, char **argv)
 
 	setup_xauth();
 
-	setup_efs();
+//	setup_efs();
 
 	set_tty();
 
-	start_oom_task();
+//	start_oom_task();
 
-	setup_pam_session();
+//	setup_pam_session();
 
 	switch_to_user();
 
@@ -84,9 +84,9 @@ int main(int argc, char **argv)
 
 	wait_for_X_signal();
 
-	start_ssh_agent();
+//	start_ssh_agent();
 
-	setup_consolekit_session();
+//	setup_consolekit_session();
 
 	/* dbus needs the CK env var */
 	start_dbus_session_bus();
@@ -94,20 +94,20 @@ int main(int argc, char **argv)
 	/* gconf needs dbus */
 	start_gconf();
 
-	maybe_start_screensaver();
+//	maybe_start_screensaver();
 
 	start_desktop_session();
 
 	/* finally, set local username to be allowed at any time,
 	 * which is not depenedent on hostname changes */
-	snprintf(xhost_cmd, 80, "/usr/bin/xhost +SI:localuser:%s",
-		 pass->pw_name);
-	if (system(xhost_cmd) != 0)
-		lprintf("%s failed", xhost_cmd);
+//	snprintf(xhost_cmd, 80, "/usr/bin/xhost +SI:localuser:%s",
+//		 pass->pw_name);
+//	if (system(xhost_cmd) != 0)
+//		lprintf("%s failed", xhost_cmd);
 
-	get_session_type();
-	autostart_desktop_files();
-	do_autostart();
+//	get_session_type();
+//	autostart_desktop_files();
+//	do_autostart();
 
 	/*
 	 * we do this now to make sure dbus etc are not spawning
@@ -115,9 +115,9 @@ int main(int argc, char **argv)
 	 * tasks at non-oomkillable priorities
 	 */
 
-	oom_adj(xpid, -17);
-	oom_adj(session_pid, -17);
-	oom_adj(getpid(), -17);
+//	oom_adj(xpid, -17);
+//	oom_adj(session_pid, -17);
+//	oom_adj(getpid(), -17);
 
 	/*
 	 * The desktop session runs here
@@ -127,10 +127,10 @@ int main(int argc, char **argv)
 	set_text_mode();
 
 	// close_consolekit_session();
-	stop_ssh_agent();
+//	stop_ssh_agent();
 	stop_dbus_session_bus();
-	close_pam_session();
-	stop_oom_task();
+//	close_pam_session();
+//	stop_oom_task();
 
 	/* Make sure that we clean up after ourselves */
 	sleep(2);

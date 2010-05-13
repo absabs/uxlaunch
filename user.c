@@ -32,7 +32,7 @@
 int uid;
 struct passwd *pass;
 
-char user_xauth_path[PATH_MAX];
+//char user_xauth_path[PATH_MAX];
 
 static void do_env(void)
 {
@@ -50,15 +50,15 @@ static void do_env(void)
 	setenv("DISPLAY", displayname, 1);
 	snprintf(buf, PATH_MAX, "/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:%s/bin", pass->pw_dir);
 	setenv("PATH", buf, 1);
-	snprintf(user_xauth_path, PATH_MAX, "%s/.Xauthority", pass->pw_dir);
-	setenv("XAUTHORITY", user_xauth_path, 1);
-	snprintf(buf, PATH_MAX, "%s/.cache", pass->pw_dir);
+//	snprintf(user_xauth_path, PATH_MAX, "%s/.Xauthority", pass->pw_dir);
+	setenv("XAUTHORITY", xauth_cookie_file, 1);
+/*	snprintf(buf, PATH_MAX, "%s/.cache", pass->pw_dir);
 	mkdir(buf, 0700);
 	setenv("XDG_CACHE_HOME", buf, 0);
 	snprintf(buf, PATH_MAX, "%s/.config", pass->pw_dir);
 	setenv("XDG_CONFIG_HOME", buf, 0);
 	setenv("OOO_FORCE_DESKTOP","gnome", 0);
-	setenv("LIBC_FATAL_STDERR_", "1", 0);
+	setenv("LIBC_FATAL_STDERR_", "1", 0);*/
 
 	file = popen("/bin/bash -l -c export", "r");
 	if (!file)
@@ -109,9 +109,9 @@ static void do_env(void)
  */
 void switch_to_user(void)
 {
-	int result;
-	FILE *fp;
-	char fn[PATH_MAX];
+//	int result;
+//	FILE *fp;
+//	char fn[PATH_MAX];
 	int ret;
 
 	lprintf("Entering switch_to_user");
@@ -130,6 +130,7 @@ void switch_to_user(void)
 
 	do_env();
 
+#if 0
 	set_i18n();
 
 	result = chdir(pass->pw_dir);
@@ -149,8 +150,10 @@ void switch_to_user(void)
 		fp = freopen(fn, "w", stdout);
 		fp = freopen(fn, "w", stderr);
 	}
+#endif
 }
 
+#if 0
 static char *scim_languages[] = { "zh_", "ja_", "ko_", "lo_", "th_" };
 
 void set_i18n(void)
@@ -206,3 +209,4 @@ void set_i18n(void)
 
 	log_environment();
 }
+#endif

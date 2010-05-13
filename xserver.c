@@ -181,8 +181,8 @@ void start_X_server(void)
 	char *xserver = NULL;
 	int ret;
 	char vt[80];
-	char xorg_log[PATH_MAX];
-	struct stat statbuf;
+//	char xorg_log[PATH_MAX];
+//	struct stat statbuf;
 
 	/* Step 1: arm the signal */
 	memset(&usr1, 0, sizeof(struct sigaction));
@@ -212,10 +212,10 @@ void start_X_server(void)
 	 */
 	signal(SIGUSR1, SIG_IGN);
 
-	if (!xserver && !access("/usr/bin/Xorg", X_OK))
-		xserver = "/usr/bin/Xorg";
 	if (!xserver && !access("/usr/bin/X", X_OK))
 		xserver = "/usr/bin/X";
+	if (!xserver && !access("/usr/bin/Xorg", X_OK))
+		xserver = "/usr/bin/Xorg";
 	if (!xserver) {
 		lprintf("No X server found!");
 		_exit(EXIT_FAILURE);
@@ -223,22 +223,22 @@ void start_X_server(void)
 
 	snprintf(vt, 80, "vt%d", tty);
 
-	snprintf(xorg_log, PATH_MAX, "/tmp/Xorg.0.%s.log", pass->pw_name);
+//	snprintf(xorg_log, PATH_MAX, "/tmp/Xorg.0.%s.log", pass->pw_name);
 
 	/* Step 4: start the X server */
-	ret = stat(xserver, &statbuf);
-	if (!ret && (statbuf.st_mode & S_ISUID)) {
+//	ret = stat(xserver, &statbuf);
+//	if (!ret && (statbuf.st_mode & S_ISUID)) {
 		execl(xserver, xserver,  displayname,
 		      "-nolisten", "tcp", "-dpi", "120", "-noreset",
 		      "-auth", xauth_cookie_file,
 		      vt, NULL);
-	} else {
+/*	} else {
 		execl(xserver, xserver,  displayname,
 		      "-nolisten", "tcp", "-dpi", "120", "-noreset",
 		      "-auth", user_xauth_path,
 		      "-logfile", xorg_log,
 		      vt, NULL);
-	}
+	}*/
 	exit(0);
 }
 
