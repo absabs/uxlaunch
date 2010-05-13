@@ -109,9 +109,6 @@ static void do_env(void)
  */
 void switch_to_user(void)
 {
-//	int result;
-//	FILE *fp;
-//	char fn[PATH_MAX];
 	int ret;
 
 	lprintf("Entering switch_to_user");
@@ -130,83 +127,4 @@ void switch_to_user(void)
 
 	do_env();
 
-#if 0
-	set_i18n();
-
-	result = chdir(pass->pw_dir);
-
-	fp = fopen(user_xauth_path, "w");
-	if (fp) {
-		if (XauWriteAuth(fp, &x_auth) != 1)
-			lprintf("Unable to write .Xauthority");
-		fclose(fp);
-	}
-
-	/* redirect further IO to .xsession-errors */
-	snprintf(fn, PATH_MAX, "%s/.xsession-errors", pass->pw_dir);
-	fp = fopen(fn, "w");
-	if (fp) {
-		fclose(fp);
-		fp = freopen(fn, "w", stdout);
-		fp = freopen(fn, "w", stderr);
-	}
-#endif
 }
-
-#if 0
-static char *scim_languages[] = { "zh_", "ja_", "ko_", "lo_", "th_" };
-
-void set_i18n(void)
-{
-	FILE *f;
-	lprintf("entering set_i18n");
-
-
-	/*
-	 * /etc/sysconfig/i18n contains shell code that sets
-	 * various i18n options in environment, typically:
-	 * LANG, SYSFONT
-	 */
-
-	f = fopen("/etc/sysconfig/i18n", "r");
-	if (f) {
-		char buf[256];
-		char *key;
-		char *val;
-
-		while (fgets(buf, 256, f) != NULL) {
-			char *c;
-
-			c = strchr(buf, '\n');
-			if (c) *c = 0; /* remove trailing \n */
-			if (buf[0] == '#')
-				continue; /* skip comments */
-
-			key = strtok(buf, "=");
-			if (!key)
-				continue;
-			val = strtok(NULL, "=\""); /* note \" */
-			if (!val)
-				continue;
-
-			/* grab the stuff we need, avoiding comments
-			 * and other user stuff we don't care for now */
-			if (!strcmp(key, "LANG")) {
-				unsigned int i;
-				setenv(key, val, 1);
-				for (i = 0; i < sizeof(scim_languages) / sizeof(scim_languages[0]); i++) {
-					if (strstr(val, scim_languages[i])) {
-						setenv("GTK_IM_MODULE", "scim-bridge", 0);
-						setenv("CLUTTER_IM_MODULE","scim-bridge", 0);
-					}
-				}
-			}
-			if (!strcmp(key, "SYSFONT"))
-				setenv(key, val, 1);
-		}
-		fclose(f);
-	}
-
-	log_environment();
-}
-#endif
