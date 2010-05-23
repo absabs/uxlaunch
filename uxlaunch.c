@@ -71,8 +71,8 @@ int main(int argc, char **argv)
 	 * we call udevadm settle and force the system to wait for
 	 * device probing to complete, which may be a long time
 	 */
-	if (system("/sbin/udevadm settle --timeout 10") != EXIT_SUCCESS)
-		lprintf("udevadm settle bash returned an error");
+//	if (system("/sbin/udevadm settle --timeout 10") != EXIT_SUCCESS)
+//		lprintf("udevadm settle bash returned an error");
 
 	start_X_server();
 
@@ -82,17 +82,17 @@ int main(int argc, char **argv)
 	 * hardware
 	 */
 
-	wait_for_X_signal();
-
-//	start_ssh_agent();
-
-//	setup_consolekit_session();
-
 	/* dbus needs the CK env var */
 	start_dbus_session_bus();
 
 	/* gconf needs dbus */
 	start_gconf();
+
+	wait_for_X_signal();
+
+//	start_ssh_agent();
+
+//	setup_consolekit_session();
 
 //	maybe_start_screensaver();
 

@@ -127,4 +127,6 @@ void switch_to_user(void)
 
 	do_env();
 
+	if (chdir(pass->pw_dir))
+		lprintf("Failed to chdir");
 }
